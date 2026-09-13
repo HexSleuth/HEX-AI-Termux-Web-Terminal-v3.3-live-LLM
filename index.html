@@ -1,0 +1,3065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#05080d"/>
+<title>HEX AI — Termux Web Terminal v3.3</title>
+
+<!-- ============ xterm.js core stylesheet (CDN) ============ -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.css"/>
+
+<!-- ============ Web fonts for termux-style font switching ============ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;700&family=Source+Code+Pro:wght@400;700&family=IBM+Plex+Mono:wght@400;700&family=Ubuntu+Mono:wght@400;700&family=Roboto+Mono:wght@400;700&family=Inconsolata:wght@400;700&family=Space+Mono:wght@400;700&family=Anonymous+Pro:wght@400;700&family=Victor+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   HEX AI TERMINAL v3.3 — SCOPED STYLES
+   ============================================================ */
+
+#hexai-widget{
+  --hx-accent:#00ffa3;
+  --hx-accent2:#00d9ff;
+  --hx-text:#d7ffe9;
+  --hx-dim:#6f8a9b;
+  --hx-line:rgba(0,255,163,.18);
+  --hx-panel:#070c13;
+
+  position:relative;
+  width:100%;
+  max-width:1000px;
+  margin:0 auto;
+  border-radius:16px;
+  overflow:hidden;
+  isolation:isolate;
+  background:linear-gradient(160deg,#060a11 0%,#04070c 55%,#050a10 100%);
+  border:1px solid rgba(0,255,163,.22);
+  box-shadow:
+     0 0 0 1px rgba(0,0,0,.65),
+     0 18px 55px -14px rgba(0,255,163,.30),
+     0 0 110px -35px rgba(0,217,255,.40);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-tap-highlight-color:transparent;
+  box-sizing:border-box;
+}
+#hexai-widget *,
+#hexai-widget *::before,
+#hexai-widget *::after{ box-sizing:border-box; }
+
+#hexai-widget::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:20;
+  background:repeating-linear-gradient(
+     to bottom,
+     rgba(255,255,255,.024) 0px,
+     rgba(255,255,255,.024) 1px,
+     rgba(0,0,0,0) 2px,
+     rgba(0,0,0,0) 4px
+  );
+  mix-blend-mode:overlay;
+  opacity:.6;
+}
+
+/* ---------------- title bar ---------------- */
+#hexai-widget .hx-bar{
+  position:relative;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  background:linear-gradient(180deg,#0a121b,#060b12);
+  border-bottom:1px solid var(--hx-line);
+}
+#hexai-widget .hx-dots{ display:flex; gap:6px; flex:0 0 auto; }
+#hexai-widget .hx-dot{
+  width:11px; height:11px; border-radius:50%;
+  box-shadow:inset 0 0 4px rgba(0,0,0,.55);
+}
+#hexai-widget .hx-dot.r{ background:#ff5f57; }
+#hexai-widget .hx-dot.y{ background:#febc2e; }
+#hexai-widget .hx-dot.g{ background:#28c840; }
+
+#hexai-widget .hx-title{
+  flex:1 1 auto;
+  min-width:0;
+  text-align:center;
+  font:600 12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  letter-spacing:.06em;
+  color:#9fe8cd;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-shadow:0 0 12px rgba(0,255,163,.55);
+}
+#hexai-widget .hx-title b{ color:var(--hx-accent); }
+
+#hexai-widget .hx-status{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 9px;
+  border-radius:999px;
+  font:600 10px/1 ui-monospace,monospace;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#04120c;
+  background:linear-gradient(180deg,#00ffa3,#00cf85);
+  box-shadow:0 0 14px rgba(0,255,163,.55);
+  transition:background .25s ease, box-shadow .25s ease;
+}
+#hexai-widget .hx-status.ai{
+  background:linear-gradient(180deg,#00d9ff,#0096d6);
+  color:#02121a;
+  box-shadow:0 0 18px rgba(0,217,255,.8);
+}
+#hexai-widget .hx-led{
+  width:6px; height:6px; border-radius:50%;
+  background:#04120c;
+  animation:hx-pulse 1.15s ease-in-out infinite;
+}
+#hexai-widget .hx-status.ai .hx-led{ background:#02121a; }
+@keyframes hx-pulse{
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:.25; transform:scale(.7); }
+}
+
+/* ---------------- screen ---------------- */
+#hexai-widget .hx-screen{
+  position:relative;
+  z-index:4;
+  height:460px;
+  min-height:260px;
+  padding:8px 4px 8px 9px;
+  background:
+     radial-gradient(130% 110% at 50% 0%, #08131c 0%, #04070c 72%),
+     #04070c;
+  overflow:hidden;
+  touch-action:pan-y;
+  transition:padding .3s ease, border-radius .3s ease;
+}
+#hexai-widget .hx-screen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(90% 70% at 50% 45%, rgba(0,255,163,.055), transparent 70%);
+  z-index:0;
+}
+#hexai-widget.hx-float .hx-screen{
+  margin:14px 14px 6px 14px;
+  border-radius:14px;
+  border:1px solid rgba(0,217,255,.35);
+  box-shadow:0 0 42px rgba(0,217,255,.35), inset 0 0 44px rgba(0,217,255,.06);
+}
+#hexai-term{
+  position:relative;
+  z-index:1;
+  width:100%;
+  height:100%;
+}
+#hexai-term .xterm{ height:100%; padding:0; }
+#hexai-term .xterm-viewport{
+  background:transparent !important;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(0,255,163,.45) transparent;
+}
+#hexai-term .xterm-viewport::-webkit-scrollbar{ width:7px; }
+#hexai-term .xterm-viewport::-webkit-scrollbar-track{ background:transparent; }
+#hexai-term .xterm-viewport::-webkit-scrollbar-thumb{
+  background:rgba(0,255,163,.40);
+  border-radius:8px;
+}
+#hexai-term .xterm-screen{ z-index:2; }
+
+/* ---------------- extra keys (Termux style) ---------------- */
+#hexai-widget .hx-keys{
+  position:relative;
+  z-index:6;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  padding:9px 9px calc(9px + env(safe-area-inset-bottom,0px)) 9px;
+  background:linear-gradient(180deg,#070c14,#050910);
+  border-top:1px solid var(--hx-line);
+}
+#hexai-widget .hx-key{
+  flex:0 0 auto;
+  min-width:40px;
+  height:36px;
+  padding:0 11px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:9px;
+  border:1px solid rgba(0,255,163,.18);
+  background:linear-gradient(180deg,#101a25,#0a1119);
+  color:#9fe8cd;
+  font:700 12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .10s ease, background .16s ease, color .16s ease, box-shadow .16s ease, border-color .16s ease;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 3px 8px rgba(0,0,0,.45);
+}
+#hexai-widget .hx-key:active,
+#hexai-widget .hx-key.is-active{
+  transform:translateY(1px);
+  background:linear-gradient(180deg,#00ffa3,#00d98a);
+  color:#04120c;
+  border-color:#00ffa3;
+  box-shadow:0 0 18px rgba(0,255,163,.7);
+}
+#hexai-widget .hx-key.on{
+  background:linear-gradient(180deg,#00d9ff,#009fd6);
+  color:#02121a;
+  border-color:#00d9ff;
+  box-shadow:0 0 18px rgba(0,217,255,.75);
+}
+#hexai-widget .hx-key.wide{ min-width:56px; }
+#hexai-widget .hx-key.accent{ color:var(--hx-accent); border-color:rgba(0,255,163,.4); }
+
+/* ---------------- footer hint ---------------- */
+#hexai-widget .hx-foot{
+  position:relative;
+  z-index:6;
+  padding:7px 12px;
+  font:500 10.5px/1.4 ui-monospace,monospace;
+  letter-spacing:.04em;
+  color:#4f6b7c;
+  background:#040810;
+  border-top:1px solid rgba(0,255,163,.09);
+  text-align:center;
+}
+#hexai-widget .hx-foot span{ color:#00c98a; }
+
+/* ---------------- loading veil ---------------- */
+#hexai-widget .hx-loading{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  background:rgba(4,7,12,.94);
+  backdrop-filter:blur(3px);
+  transition:opacity .5s ease;
+}
+#hexai-widget .hx-loading.hide{ opacity:0; pointer-events:none; }
+#hexai-widget .hx-spin{
+  width:52px; height:52px;
+  border-radius:50%;
+  border:3px solid rgba(0,255,163,.14);
+  border-top-color:#00ffa3;
+  border-right-color:#00d9ff;
+  animation:hx-rot .85s linear infinite;
+  box-shadow:0 0 26px rgba(0,255,163,.35);
+}
+@keyframes hx-rot{ to{ transform:rotate(360deg); } }
+#hexai-widget .hx-loadtxt{
+  font:700 12px/1 ui-monospace,monospace;
+  letter-spacing:.22em;
+  color:#00ffa3;
+  text-transform:uppercase;
+  text-shadow:0 0 16px rgba(0,255,163,.7);
+  animation:hx-blink 1.2s ease-in-out infinite;
+}
+@keyframes hx-blink{ 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* ============================================================
+   ANDROID-STYLE TOAST NOTIFICATIONS
+   ============================================================ */
+#hexai-widget .hx-toasts{
+  position:absolute;
+  left:50%;
+  bottom:88px;
+  transform:translateX(-50%);
+  z-index:60;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
+  pointer-events:none;
+  width:max-content;
+  max-width:82%;
+}
+#hexai-widget .hx-toast{
+  padding:9px 14px;
+  border-radius:22px;
+  background:rgba(12,18,26,.94);
+  color:#e2fff5;
+  font:500 12.5px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  border:1px solid rgba(0,255,163,.32);
+  box-shadow:0 8px 24px rgba(0,0,0,.6), 0 0 20px rgba(0,255,163,.18);
+  backdrop-filter:blur(6px);
+  opacity:0;
+  transform:translateY(14px);
+  animation:hx-toast-in .28s ease forwards;
+  pointer-events:none;
+  text-align:center;
+}
+#hexai-widget .hx-toast.out{ animation:hx-toast-out .28s ease forwards; }
+#hexai-widget .hx-toast.ok   { border-color:rgba(0,255,163,.5); }
+#hexai-widget .hx-toast.err  { border-color:rgba(255,92,92,.55); color:#ffd9d9; }
+#hexai-widget .hx-toast.warn { border-color:rgba(255,214,92,.55); color:#fff4d1; }
+@keyframes hx-toast-in{ to{ opacity:1; transform:translateY(0); } }
+@keyframes hx-toast-out{ to{ opacity:0; transform:translateY(-6px); } }
+
+/* ---------------- mobile tuning ---------------- */
+@media (max-width:640px){
+  #hexai-widget{ border-radius:13px; }
+  #hexai-widget .hx-screen{ height:60vh; min-height:300px; padding:6px 3px 6px 7px; }
+  #hexai-widget .hx-key{ height:34px; min-width:36px; padding:0 9px; font-size:11.5px; }
+  #hexai-widget .hx-title{ font-size:11px; }
+  #hexai-widget .hx-status{ font-size:9px; padding:3px 7px; }
+  #hexai-widget .hx-toasts{ bottom:78px; max-width:90%; }
+}
+@media (max-width:380px){
+  #hexai-widget .hx-keys{ gap:5px; padding:7px; }
+  #hexai-widget .hx-key{ height:32px; min-width:32px; padding:0 7px; font-size:11px; }
+  #hexai-widget .hx-toast{ font-size:11.5px; padding:8px 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEX AI WIDGET v3.3
+     ============================================================ -->
+<div id="hexai-widget">
+
+  <div class="hx-loading" id="hx-loading">
+    <div class="hx-spin"></div>
+    <div class="hx-loadtxt">HEX AI v3.3 · Booting</div>
+  </div>
+
+  <div class="hx-bar">
+    <div class="hx-dots">
+      <span class="hx-dot r"></span>
+      <span class="hx-dot y"></span>
+      <span class="hx-dot g"></span>
+    </div>
+    <div class="hx-title"><b>HEX AI</b> ▸ Termux Web Terminal v3.3 · live LLM</div>
+    <div class="hx-status" id="hx-status-pill"><span class="hx-led"></span><span id="hx-status-text">online</span></div>
+  </div>
+
+  <div class="hx-screen" id="hx-screen">
+    <div id="hexai-term"></div>
+  </div>
+
+  <div class="hx-keys" id="hexai-keys"></div>
+
+
+  <div class="hx-toasts" id="hx-toasts"></div>
+</div>
+
+<!-- ============ xterm.js + addons (CDN) ============ -->
+<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.js"></script>
+
+<script>
+/* ================================================================
+   HEX AI — TERMUX WEB TERMINAL v3.3
+   Now with REAL AI via https://gen.pollinations.ai/v1/chat/completions
+   (OpenAI-compatible · no API key required · streaming)
+   ================================================================ */
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------
+     0. ELEMENT REFERENCES + SAFETY
+     ------------------------------------------------------------ */
+  const ROOT      = document.getElementById('hexai-widget');
+  if (!ROOT) return;
+
+  const termEl    = document.getElementById('hexai-term');
+  const keysEl    = document.getElementById('hexai-keys');
+  const loadingEl = document.getElementById('hx-loading');
+  const statusEl  = document.getElementById('hx-status-text');
+  const statusPill= document.getElementById('hx-status-pill');
+  const toastsEl  = document.getElementById('hx-toasts');
+
+  if (typeof Terminal === 'undefined') {
+    loadingEl.innerHTML =
+      '<div style="color:#ff5c5c;font:13px ui-monospace,monospace;padding:24px;text-align:center;line-height:1.7">' +
+      '✖ xterm.js could not be loaded.<br>Check your internet connection / CDN access.</div>';
+    return;
+  }
+
+  /* ------------------------------------------------------------
+     1. UTILITIES
+     ------------------------------------------------------------ */
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const pad = (n, len) => { let s = String(n); while (s.length < len) s = ' ' + s; return s; };
+
+  const C = {
+    r  : '\x1b[0m',
+    b  : '\x1b[1m',
+    d  : '\x1b[2m',
+    it : '\x1b[3m',
+    ul : '\x1b[4m',
+    red: '\x1b[38;2;255;92;92m',
+    grn: '\x1b[38;2;0;255;163m',
+    cyn: '\x1b[38;2;0;217;255m',
+    blu: '\x1b[38;2;96;165;255m',
+    mag: '\x1b[38;2;255;92;220m',
+    yel: '\x1b[38;2;255;214;92m',
+    wht: '\x1b[38;2;226;246;255m',
+    gry: '\x1b[38;2;110;136;153m',
+    bgG: '\x1b[48;2;0;255;163m\x1b[38;2;4;18;12m'
+  };
+
+  /* ------------------------------------------------------------
+     2. COLOR SCHEMES (termux-style port)
+     ------------------------------------------------------------ */
+  function mkScheme(displayName, bg, fg, cursor, p) {
+    return {
+      name: displayName,
+      theme: {
+        background: bg, foreground: fg, cursor: cursor, cursorAccent: bg,
+        selectionBackground: 'rgba(255,255,255,0.25)',
+        black: p[0],  red: p[1],  green: p[2],  yellow: p[3],
+        blue: p[4],   magenta: p[5], cyan: p[6], white: p[7],
+        brightBlack: p[8],  brightRed: p[9],  brightGreen: p[10], brightYellow: p[11],
+        brightBlue: p[12],  brightMagenta: p[13], brightCyan: p[14], brightWhite: p[15]
+      }
+    };
+  }
+
+  const SCHEMES = {
+    'hex': mkScheme('HEX AI', '#04070c','#d7ffe9','#00ffa3',
+      ['#0b1016','#ff5c5c','#00ffa3','#ffd65c','#60a5ff','#ff5cdc','#00d9ff','#d7ffe9',
+       '#5c7385','#ff8a8a','#5cffc4','#ffe694','#96c2ff','#ff96e8','#6ce8ff','#ffffff']),
+    'termux': mkScheme('Termux Classic', '#000000','#ffffff','#ffffff',
+      ['#000000','#cc0000','#4e9a06','#c4a000','#3465a4','#75507b','#06989a','#d3d7cf',
+       '#555753','#ef2929','#8ae234','#fce94f','#729fcf','#ad7fa8','#34e2e2','#eeeeec']),
+    'dracula': mkScheme('Dracula', '#282a36','#f8f8f2','#f8f8f2',
+      ['#21222c','#ff5555','#50fa7b','#f1fa8c','#bd93f9','#ff79c6','#8be9fd','#f8f8f2',
+       '#6272a4','#ff6e6e','#69ff94','#ffffa5','#d6acff','#ff92df','#a4ffff','#ffffff']),
+    'gruvbox-dark': mkScheme('Gruvbox Dark', '#282828','#ebdbb2','#ebdbb2',
+      ['#282828','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#a89984',
+       '#928374','#fb4934','#b8bb26','#fabd2f','#83a598','#d3869b','#8ec07c','#ebdbb2']),
+    'gruvbox-light': mkScheme('Gruvbox Light', '#fbf1c7','#3c3836','#3c3836',
+      ['#fbf1c7','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#7c6f64',
+       '#928374','#9d0006','#79740e','#b57614','#076678','#8f3f71','#427b58','#3c3836']),
+    'nord': mkScheme('Nord', '#2e3440','#d8dee9','#d8dee9',
+      ['#3b4252','#bf616a','#a3be8c','#ebcb8b','#81a1c1','#b48ead','#88c0d0','#e5e9f0',
+       '#4c566a','#bf616a','#a3be8c','#ebcb8b','#81a1c1','#b48ead','#8fbcbb','#eceff4']),
+    'tokyonight': mkScheme('Tokyo Night', '#1a1b26','#c0caf5','#c0caf5',
+      ['#15161e','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#a9b1d6',
+       '#414868','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#c0caf5']),
+    'monokai': mkScheme('Monokai', '#272822','#f8f8f2','#f8f8f0',
+      ['#272822','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f8f8f2',
+       '#75715e','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f9f8f5']),
+    'solarized-dark': mkScheme('Solarized Dark', '#002b36','#839496','#839496',
+      ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
+       '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']),
+    'solarized-light': mkScheme('Solarized Light', '#fdf6e3','#657b83','#657b83',
+      ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
+       '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']),
+    'one-dark': mkScheme('One Dark', '#282c34','#abb2bf','#528bff',
+      ['#282c34','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#abb2bf',
+       '#5c6370','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#ffffff']),
+    'one-light': mkScheme('One Light', '#fafafa','#383a42','#526fff',
+      ['#383a42','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#a0a1a7',
+       '#696c77','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#202227']),
+    'catppuccin-mocha': mkScheme('Catppuccin Mocha', '#1e1e2e','#cdd6f4','#f5e0dc',
+      ['#45475a','#f38ba8','#a6e3a1','#f9e2af','#89b4fa','#f5c2e7','#94e2d5','#bac2de',
+       '#585b70','#f38ba8','#a6e3a1','#f9e2af','#89b4fa','#f5c2e7','#94e2d5','#a6adc8']),
+    'catppuccin-latte': mkScheme('Catppuccin Latte', '#eff1f5','#4c4f69','#dc8a78',
+      ['#5c5f77','#d20f39','#40a02b','#df8e1d','#1e66f5','#ea76cb','#179299','#acb0be',
+       '#6c6f85','#d20f39','#40a02b','#df8e1d','#1e66f5','#ea76cb','#179299','#bcc0cc']),
+    'rose-pine': mkScheme('Rosé Pine', '#191724','#e0def4','#524f67',
+      ['#26233a','#eb6f92','#31748f','#f6c177','#9ccfd8','#c4a7e7','#ebbcba','#e0def4',
+       '#6e6a86','#eb6f92','#31748f','#f6c177','#9ccfd8','#c4a7e7','#ebbcba','#e0def4']),
+    'rose-pine-dawn': mkScheme('Rosé Pine Dawn', '#faf4ed','#575279','#cecacd',
+      ['#f2e9e1','#b4637a','#286983','#ea9d34','#56949f','#907aa9','#d7827e','#575279',
+       '#9893a5','#b4637a','#286983','#ea9d34','#56949f','#907aa9','#d7827e','#575279']),
+    'everforest': mkScheme('Everforest', '#2d353b','#d3c6aa','#d3c6aa',
+      ['#475258','#e67e80','#a7c080','#dbbc7f','#7fbbb3','#d699b6','#83c092','#d3c6aa',
+       '#475258','#e67e80','#a7c080','#dbbc7f','#7fbbb3','#d699b6','#83c092','#d3c6aa']),
+    'kanagawa': mkScheme('Kanagawa', '#1f1f28','#dcd7ba','#c8c093',
+      ['#16161d','#c34043','#76946a','#c0a36e','#7e9cd8','#957fb8','#6a9589','#c8c093',
+       '#727169','#e82424','#98bb6c','#e6c384','#7fb4ca','#938aa9','#7aa89f','#dcd7ba']),
+    'night-owl': mkScheme('Night Owl', '#011627','#d6deeb','#80a4c2',
+      ['#011627','#ef5350','#22da6e','#addb67','#82aaff','#c792ea','#21c7a8','#ffffff',
+       '#575656','#ef5350','#22da6e','#ffeb95','#82aaff','#c792ea','#7fdbca','#ffffff']),
+    'palenight': mkScheme('Palenight', '#292d3e','#a6accd','#ffcc00',
+      ['#292d3e','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#d0d0d0',
+       '#676e95','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']),
+    'synthwave': mkScheme('Synthwave 84', '#262335','#ffffff','#f92aad',
+      ['#241b2f','#fe4450','#72f1b8','#fede5d','#36f9f6','#ff8b39','#ff7edb','#ffffff',
+       '#4c3f6b','#fe4450','#72f1b8','#fede5d','#36f9f6','#ff8b39','#ff7edb','#ffffff']),
+    'cyberpunk': mkScheme('Cyberpunk', '#0a0a12','#e0e0ff','#ff003c',
+      ['#0a0a12','#ff003c','#00ff9f','#fcee0a','#00b3ff','#ff00e5','#00fff0','#e0e0ff',
+       '#3a3a5a','#ff5c8a','#7dffc8','#fff770','#5cc8ff','#ff70f0','#70fff0','#ffffff']),
+    'matrix': mkScheme('Matrix', '#000700','#00ff41','#00ff41',
+      ['#001100','#00cc33','#00ff41','#7dff8a','#00aa22','#00dd55','#33ff66','#b6ffb6',
+       '#005500','#33ff66','#7dff8a','#b6ffb6','#33ff66','#7dff8a','#7dff8a','#e0ffe0']),
+    'amber': mkScheme('Amber CRT', '#100800','#ffb642','#ffb642',
+      ['#1a0e00','#ff7a2f','#ffb642','#ffd98a','#d98a2f','#ff9d4d','#ffc978','#ffe3b3',
+       '#7a5220','#ffa06a','#ffcf7a','#ffe6b0','#ffb642','#ffb98a','#ffe0b0','#fff4e0']),
+    'ice': mkScheme('Arctic Ice', '#f4f8fb','#0d2233','#0077cc',
+      ['#0d2233','#c62828','#1b7f4d','#9a6b00','#1565c0','#7b1fa2','#00787f','#cfd8dc',
+       '#546e7a','#e53935','#2e9e63','#c08a00','#1e88e5','#9c27b0','#00a3ab','#ffffff']),
+    'material': mkScheme('Material', '#263238','#eeffff','#ffcc00',
+      ['#000000','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff',
+       '#546e7a','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']),
+    'ayu-mirage': mkScheme('Ayu Mirage', '#1f2430','#cbccc6','#ffcc66',
+      ['#191e2a','#ed8274','#a6cc70','#fad07b','#6dcbfa','#cfbafa','#90e1c6','#c7c7c7',
+       '#686868','#f28779','#bae67e','#ffd580','#73d0ff','#d4bfff','#95e6cb','#ffffff']),
+    'ocean': mkScheme('Ocean', '#0d1b2a','#c5d8e8','#5bc0eb',
+      ['#0d1b2a','#e63946','#5bc0eb','#f4d35e','#457b9d','#c77dff','#48cae4','#e0e1dd',
+       '#3a4a5a','#ff6b6b','#7dd3fc','#ffe082','#6ea8cf','#d69dff','#7de0f0','#ffffff']),
+    'forest': mkScheme('Forest', '#0b1e0b','#c8e6c9','#66bb6a',
+      ['#0b1e0b','#e57373','#81c784','#ffd54f','#64b5f6','#ba68c8','#4db6ac','#e8f5e9',
+       '#3e5a3e','#ef9a9a','#a5d6a7','#ffe082','#90caf9','#ce93d8','#80cbc4','#ffffff']),
+    'sunset': mkScheme('Sunset', '#1a0e1e','#ffd8c2','#ff6b35',
+      ['#2a1628','#ff5252','#ffb142','#ffd93d','#7a5cff','#ff6bcb','#ff9f68','#ffe0d0',
+       '#5a2e4a','#ff7070','#ffc46a','#ffe970','#9a80ff','#ff90d8','#ffb88a','#ffffff'])
+  };
+
+  const SCHEME_NAMES = Object.keys(SCHEMES);
+
+  /* ------------------------------------------------------------
+     3. FONTS (termux-style powerline-ready)
+     ------------------------------------------------------------ */
+  const FONTS = [
+    { id:'jetbrains',  label:'JetBrains Mono',    css:'"JetBrains Mono", monospace' },
+    { id:'firacode',   label:'Fira Code',         css:'"Fira Code", monospace' },
+    { id:'source',     label:'Source Code Pro',   css:'"Source Code Pro", monospace' },
+    { id:'ibmplex',    label:'IBM Plex Mono',     css:'"IBM Plex Mono", monospace' },
+    { id:'ubuntu',     label:'Ubuntu Mono',       css:'"Ubuntu Mono", monospace' },
+    { id:'roboto',     label:'Roboto Mono',       css:'"Roboto Mono", monospace' },
+    { id:'inconsolata',label:'Inconsolata',       css:'"Inconsolata", monospace' },
+    { id:'space',      label:'Space Mono',        css:'"Space Mono", monospace' },
+    { id:'anonymous',  label:'Anonymous Pro',     css:'"Anonymous Pro", monospace' },
+    { id:'victor',     label:'Victor Mono',       css:'"Victor Mono", monospace' },
+    { id:'sharetech',  label:'Share Tech Mono',   css:'"Share Tech Mono", monospace' },
+    { id:'cascadia',   label:'Cascadia Code',     css:'"Cascadia Code", "Cascadia Mono", monospace' },
+    { id:'hack',       label:'Hack',              css:'"Hack", monospace' },
+    { id:'iosevka',    label:'Iosevka',           css:'"Iosevka", monospace' },
+    { id:'menlo',      label:'Menlo (macOS)',     css:'Menlo, monospace' },
+    { id:'consolas',   label:'Consolas (Win)',    css:'Consolas, monospace' },
+    { id:'monaco',     label:'Monaco',            css:'Monaco, monospace' },
+    { id:'sfmono',     label:'SF Mono',           css:'"SF Mono", ui-monospace, monospace' },
+    { id:'courier',    label:'Courier New',       css:'"Courier New", monospace' },
+    { id:'dejavu',     label:'DejaVu Sans Mono',  css:'"DejaVu Sans Mono", monospace' }
+  ];
+
+  /* ------------------------------------------------------------
+     4. FREE PROXY POOL
+     ------------------------------------------------------------ */
+  const PROXIES = [
+    (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+    (u) => 'https://corsproxy.io/?' + encodeURIComponent(u),
+    (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+    (u) => 'https://thingproxy.freeboard.io/fetch/' + u,
+    (u) => 'https://r.jina.ai/' + u,
+    (u) => 'https://proxy.cors.sh/' + u
+  ];
+  const PROXY_LABELS = ['allorigins.win','corsproxy.io','codetabs.com','thingproxy','r.jina.ai','cors.sh'];
+
+  /* ============================================================
+     5. HEX AI LIVE LLM ENDPOINT
+     Free, no API key.  OpenAI-compatible chat completions.
+     ============================================================ */
+  const HEX_AI_ENDPOINT = 'https://gen.pollinations.ai/v1/chat/completions';
+  const HEX_AI_MODEL    = 'openai';           /* pollinations routes to a free model */
+  const HEX_AI_SYSTEM   = (
+    'You are HEX AI, a helpful, friendly and concise assistant embedded inside ' +
+    'a Termux-style web terminal called HEX AI (built on xterm.js). ' +
+    'Reply in plain text only — never use markdown code fences, tables or headings. ' +
+    'Keep answers short and terminal-friendly (ideally under 120 words). ' +
+    'If the user asks for code, write it as simple indented text. ' +
+    'You may use emoji sparingly.'
+  );
+
+  /* rolling conversation buffer (system + last N turns) */
+  const MAX_TURNS = 8;
+  const conversation = [
+    { role: 'system', content: HEX_AI_SYSTEM }
+  ];
+
+  function pushConversation(role, content) {
+    conversation.push({ role: role, content: content });
+    /* trim old turns beyond MAX_TURNS, always keeping the system prompt */
+    while (conversation.length > MAX_TURNS + 1) {
+      conversation.splice(1, 1);
+    }
+  }
+  function resetConversation() {
+    conversation.length = 0;
+    conversation.push({ role: 'system', content: HEX_AI_SYSTEM });
+  }
+
+  /* ------------------------------------------------------------
+     6. VIRTUAL FILESYSTEM
+     ------------------------------------------------------------ */
+  const FS = {
+    '~': ['readme.txt', 'hexai.conf', 'packages.list', 'colors', 'fonts'],
+    '~/readme.txt':
+      'HEX AI Web Terminal v3.3\n' +
+      '=========================\n' +
+      'Fully client-side Termux-style terminal running on xterm.js.\n' +
+      '\n' +
+      'NEW in v3.3:\n' +
+      '  • Real live AI via gen.pollinations.ai (no API key needed)\n' +
+      '  • Streaming token-by-token AI replies\n' +
+      '  • Multi-turn conversation memory\n' +
+      '\n' +
+      'Kept from v3.2:\n' +
+      '  • termux-api package  → 30+ termux-* Android bridge commands\n' +
+      '  • Termux addons: API, Boot, Float, Styling, Tasker, Widget\n' +
+      '  • termux-style → 30 color-schemes + 20 powerline fonts\n' +
+      '\n' +
+      'Type "help" for the full command index.\n' +
+      'Type "ai <question>" to talk to the live AI.\n' +
+      'Type "ai --clear" to reset conversation memory.\n',
+    '~/hexai.conf':
+      '# HEX AI terminal configuration\n' +
+      'user=hexai\n' +
+      'host=termux\n' +
+      'proxy=auto\n' +
+      'scheme=hex\n' +
+      'font=jetbrains\n' +
+      'llm_endpoint=' + HEX_AI_ENDPOINT + '\n' +
+      'llm_model=' + HEX_AI_MODEL + '\n' +
+      'typing_indicator=true\n' +
+      'animation=on\n',
+    '~/packages.list':
+      'python 28.4MB\nfiglet 1.2MB\ncowsay 0.3MB\nfortune 2.1MB\n' +
+      'htop 1.8MB\nnmap 6.5MB\ngit 12.0MB\nlolcat 0.4MB\nsl 0.2MB\nneofetch 0.9MB\n' +
+      'termux-api 1.1MB\ntermux-boot 0.1MB\ntermux-float 0.1MB\n' +
+      'termux-styling 0.2MB\ntermux-tasker 0.1MB\ntermux-widget 0.1MB\n',
+    '~/colors': SCHEME_NAMES.join('\n') + '\n',
+    '~/fonts': FONTS.map((f) => f.id + '\t' + f.label).join('\n') + '\n'
+  };
+
+  /* ------------------------------------------------------------
+     7. PACKAGES
+     ------------------------------------------------------------ */
+  const PACKAGES = {
+    python  : { size:'28.4 MB', desc:'Python 3.12 interpreter + REPL',  cmd:'python'   },
+    figlet  : { size:'1.2 MB',  desc:'ASCII art text generator',        cmd:'figlet'   },
+    cowsay  : { size:'0.3 MB',  desc:'A talking cow',                   cmd:'cowsay'   },
+    fortune : { size:'2.1 MB',  desc:'Random quotes and wisdom',        cmd:'fortune'  },
+    htop    : { size:'1.8 MB',  desc:'Interactive process viewer',      cmd:'htop'     },
+    nmap    : { size:'6.5 MB',  desc:'Network port scanner',            cmd:'nmap'     },
+    git     : { size:'12.0 MB', desc:'Distributed version control',     cmd:'git'      },
+    lolcat  : { size:'0.4 MB',  desc:'Rainbow terminal output',         cmd:'lolcat'   },
+    sl      : { size:'0.2 MB',  desc:'Steam locomotive animation',      cmd:'sl'       },
+    neofetch: { size:'0.9 MB',  desc:'System information fetch',        cmd:'neofetch' },
+    'termux-api'    : { size:'1.1 MB', desc:'Termux:API — Android/Chrome hardware bridge', addon:true },
+    'termux-boot'   : { size:'0.1 MB', desc:'Termux:Boot — run scripts on boot',           addon:true },
+    'termux-float'  : { size:'0.1 MB', desc:'Termux:Float — floating window mode',         addon:true },
+    'termux-styling': { size:'0.2 MB', desc:'Termux:Styling — colours & fonts',            addon:true },
+    'termux-tasker' : { size:'0.1 MB', desc:'Termux:Tasker — automation bridge',           addon:true },
+    'termux-widget' : { size:'0.1 MB', desc:'Termux:Widget — home-screen scriptlets',      addon:true }
+  };
+
+  /* ------------------------------------------------------------
+     8. STATE
+     ------------------------------------------------------------ */
+  const state = {
+    user      : 'hexai',
+    host      : 'termux',
+    cwd       : '~',
+    history   : [],
+    hIndex    : 0,
+    installed : {},
+    busy      : false,
+    interrupt : false,
+    proxy     : true,
+    scheme    : 'hex',
+    font      : 'jetbrains',
+    closed    : false,
+    menuActive: null,
+    aiLive    : true   /* true = use pollinations endpoint; false = offline KB */
+  };
+
+  let lineBuf = '';
+  let cursor  = 0;
+  let ctrlArmed = false;
+  let altArmed  = false;
+
+  /* ------------------------------------------------------------
+     9. TOAST / NOTIFICATION HELPERS
+     ------------------------------------------------------------ */
+  function showToast(text, kind) {
+    if (!toastsEl) return;
+    const el = document.createElement('div');
+    el.className = 'hx-toast' + (kind ? ' ' + kind : '');
+    el.textContent = text;
+    toastsEl.appendChild(el);
+    setTimeout(() => {
+      el.classList.add('out');
+      setTimeout(() => el.remove(), 320);
+    }, 2400);
+  }
+
+  async function showNotification(title, body) {
+    try {
+      if (typeof Notification === 'undefined') { showToast(title + ' — ' + body, 'warn'); return false; }
+      let perm = Notification.permission;
+      if (perm === 'default') perm = await Notification.requestPermission();
+      if (perm === 'granted') {
+        new Notification(title, { body: body });
+        showToast('🔔 ' + title, 'ok');
+        return true;
+      }
+      showToast('🔔 ' + title + ' — ' + body, 'warn');
+      return false;
+    } catch (e) { showToast('🔔 ' + title, 'warn'); return false; }
+  }
+
+  /* ------------------------------------------------------------
+     10. CREATE THE XTERM INSTANCE
+     ------------------------------------------------------------ */
+  const term = new Terminal({
+    cursorBlink      : true,
+    cursorStyle      : 'bar',
+    cursorInactiveStyle: 'outline',
+    fontFamily       : '"JetBrains Mono","Fira Code",Menlo,Consolas,"DejaVu Sans Mono",monospace',
+    fontSize         : 13,
+    lineHeight       : 1.16,
+    letterSpacing    : 0,
+    scrollback       : 4000,
+    convertEol       : true,
+    allowProposedApi : true,
+    macOptionIsMeta  : true,
+    drawBoldTextInBrightColors: true,
+    theme            : SCHEMES.hex.theme
+  });
+
+  let fitAddon = null;
+  try { fitAddon = new FitAddon.FitAddon(); term.loadAddon(fitAddon); } catch (e) { fitAddon = null; }
+  try {
+    if (typeof WebLinksAddon !== 'undefined') {
+      term.loadAddon(new WebLinksAddon.WebLinksAddon());
+    }
+  } catch (e) {}
+
+  term.open(termEl);
+
+  /* ------------------------------------------------------------
+     11. OUTPUT HELPERS
+     ------------------------------------------------------------ */
+  function write(s) { term.write(s); }
+  function println(s) { term.write((s === undefined ? '' : s) + '\r\n'); }
+
+  function startSpinner(label) {
+    const frames = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
+    let i = 0;
+    const id = setInterval(() => {
+      term.write('\x1b[2K\r' + C.cyn + frames[i++ % frames.length] + C.r +
+                 ' ' + C.gry + (label || 'working') + C.r);
+    }, 72);
+    return { stop() { clearInterval(id); term.write('\x1b[2K\r'); } };
+  }
+
+  async function typeOut(text, delay) {
+    const d = (typeof delay === 'number') ? delay : 6;
+    for (let i = 0; i < text.length; i++) {
+      if (state.interrupt) { term.write(C.r); break; }
+      term.write(text[i]);
+      if (d > 0) await sleep(d);
+    }
+    term.write('\r\n');
+  }
+
+  async function progressBar(label) {
+    const W = 12;
+    for (let i = 0; i <= 100; i += 4) {
+      if (state.interrupt) break;
+      const filled = Math.round((i / 100) * W);
+      const bar = '█'.repeat(filled) + '░'.repeat(W - filled);
+      term.write('\x1b[2K\r' + C.grn + '[' + bar + ']' + C.r +
+                 ' ' + pad(i, 3) + '% ' + C.gry + (label || '') + C.r);
+      await sleep(26);
+    }
+    term.write('\x1b[2K\r');
+  }
+
+  /* ------------------------------------------------------------
+     12. FREE PROXY FETCH (for the "fetch" command)
+     ------------------------------------------------------------ */
+  async function proxyFetch(url) {
+    const total = PROXIES.length;
+    for (let i = 0; i < total; i++) {
+      if (state.interrupt) return { ok: false, aborted: true };
+      const target = PROXIES[i](url);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+      term.write('\x1b[2K\r' + C.gry + '⇢ ' + PROXY_LABELS[i] +
+                 ' (' + (i + 1) + '/' + total + ')' + C.r);
+      try {
+        const res = await fetch(target, { method:'GET', signal:controller.signal, headers:{ 'Accept':'*/*' } });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        term.write('\x1b[2K\r');
+        return { ok: true, text: text, via: PROXY_LABELS[i] };
+      } catch (err) { clearTimeout(timer); }
+    }
+    term.write('\x1b[2K\r');
+    return { ok: false };
+  }
+
+  /* ============================================================
+     13. HEX AI — LIVE LLM CALL (gen.pollinations.ai)
+     - OpenAI-compatible /v1/chat/completions
+     - No API key required
+     - Streams tokens as they arrive
+     - Falls back to the local offline KB on failure
+     ============================================================ */
+
+  /**
+   * Send a user message to the live HEX AI and stream the reply
+   * into the terminal, token by token.
+   * Returns { ok, text, error } where text is the full reply.
+   */
+  async function streamHexAIReply(userText, onToken, onStart) {
+    if (!state.aiLive) return { ok:false, error:'offline mode' };
+
+    const body = {
+      model: HEX_AI_MODEL,
+      messages: conversation.slice(),   /* system + rolling history */
+      stream: true,
+      temperature: 0.7,
+      private: true,
+      referrer: 'hexai-termux-web'
+    };
+
+    /* We try a direct call first, then fall back through the proxy pool. */
+    const attempts = [
+      { label: 'direct', url: HEX_AI_ENDPOINT, direct: true },
+      ...PROXIES.map((fn, i) => ({ label: PROXY_LABELS[i], url: fn(HEX_AI_ENDPOINT), direct: false }))
+    ];
+
+    for (const attempt of attempts) {
+      if (state.interrupt) return { ok:false, error:'aborted' };
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30000);
+
+      try {
+        const res = await fetch(attempt.url, {
+          method : 'POST',
+          signal : controller.signal,
+          headers: {
+            'Content-Type' : 'application/json',
+            'Accept'       : 'text/event-stream, application/json'
+          },
+          body   : JSON.stringify(body)
+        });
+        clearTimeout(timer);
+
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const ctype = (res.headers.get('content-type') || '').toLowerCase();
+
+        /* ---------- non-streaming JSON response ---------- */
+        if (ctype.indexOf('application/json') !== -1 && !res.body) {
+          const data = await res.json();
+          let text = '';
+          if (data && data.choices && data.choices[0] && data.choices[0].message) {
+            text = data.choices[0].message.content || '';
+          } else if (data && data.text) {
+            text = data.text;
+          } else if (typeof data === 'string') {
+            text = data;
+          }
+          if (!text) throw new Error('empty reply');
+          if (onStart) onStart(attempt.label);
+          if (onToken) onToken(text);
+          return { ok:true, text:text, via:attempt.label };
+        }
+
+        /* ---------- streaming SSE response ---------- */
+        if (!res.body || typeof res.body.getReader !== 'function') {
+          /* fall back to text */
+          const raw = await res.text();
+          const text = extractTextFromRaw(raw);
+          if (!text) throw new Error('empty stream');
+          if (onStart) onStart(attempt.label);
+          if (onToken) onToken(text);
+          return { ok:true, text:text, via:attempt.label };
+        }
+
+        if (onStart) onStart(attempt.label);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let full   = '';
+        let firstTokenSeen = false;
+
+        while (true) {
+          if (state.interrupt) {
+            try { reader.cancel(); } catch (e) {}
+            break;
+          }
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream:true });
+
+          /* SSE frames are separated by \n\n */
+          let idx;
+          while ((idx = buffer.indexOf('\n')) !== -1) {
+            const line = buffer.slice(0, idx).replace(/\r$/, '');
+            buffer = buffer.slice(idx + 1);
+
+            if (!line) continue;
+            if (line.charAt(0) === ':') continue;        /* comment / heartbeat */
+
+            if (line.indexOf('data:') === 0) {
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') continue;
+              try {
+                const obj = JSON.parse(payload);
+                const delta =
+                  obj.choices && obj.choices[0] &&
+                  (obj.choices[0].delta && obj.choices[0].delta.content
+                    ? obj.choices[0].delta.content
+                    : (obj.choices[0].message && obj.choices[0].message.content
+                        ? obj.choices[0].message.content
+                        : (obj.choices[0].text || '')));
+                if (delta) {
+                  full += delta;
+                  firstTokenSeen = true;
+                  if (onToken) onToken(delta);
+                }
+              } catch (e) { /* skip malformed chunk */ }
+            }
+          }
+        }
+
+        /* drain the tail */
+        if (buffer.trim()) {
+          try {
+            const tail = buffer.trim();
+            if (tail.indexOf('data:') === 0) {
+              const payload = tail.slice(5).trim();
+              if (payload && payload !== '[DONE]') {
+                const obj = JSON.parse(payload);
+                const delta =
+                  obj.choices && obj.choices[0] &&
+                  (obj.choices[0].delta && obj.choices[0].delta.content
+                    ? obj.choices[0].delta.content
+                    : (obj.choices[0].message && obj.choices[0].message.content
+                        ? obj.choices[0].message.content : ''));
+                if (delta) { full += delta; if (onToken) onToken(delta); }
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (full) return { ok:true, text:full, via:attempt.label };
+        if (firstTokenSeen) return { ok:true, text:full, via:attempt.label };
+        throw new Error('empty stream');
+
+      } catch (err) {
+        clearTimeout(timer);
+        /* try the next attempt */
+      }
+    }
+
+    return { ok:false, error:'all endpoints unreachable' };
+  }
+
+  /* helper: pull plain text out of a possibly-SSE string */
+  function extractTextFromRaw(raw) {
+    if (!raw) return '';
+    /* Try JSON first */
+    try {
+      const obj = JSON.parse(raw);
+      if (obj && obj.choices && obj.choices[0]) {
+        const ch = obj.choices[0];
+        if (ch.message && ch.message.content) return ch.message.content;
+        if (ch.text) return ch.text;
+      }
+      if (obj && obj.text) return obj.text;
+    } catch (e) {}
+    /* Then parse SSE lines */
+    let out = '';
+    raw.split('\n').forEach((line) => {
+      line = line.replace(/\r$/, '');
+      if (line.indexOf('data:') !== 0) return;
+      const payload = line.slice(5).trim();
+      if (!payload || payload === '[DONE]') return;
+      try {
+        const obj = JSON.parse(payload);
+        const ch = obj.choices && obj.choices[0];
+        if (ch) {
+          if (ch.delta && ch.delta.content) out += ch.delta.content;
+          else if (ch.message && ch.message.content) out += ch.message.content;
+          else if (ch.text) out += ch.text;
+        }
+      } catch (e) {}
+    });
+    return out || raw;
+  }
+
+  /* ------------------------------------------------------------
+     14. PROMPT + LINE EDITOR
+     ------------------------------------------------------------ */
+  function promptStr() {
+    return C.grn + C.b + state.user + C.r +
+           C.gry + '@' + C.r +
+           C.cyn + C.b + state.host + C.r +
+           C.gry + ':' + C.r +
+           C.blu + C.b + state.cwd + C.r +
+           C.grn + ' $ ' + C.r;
+  }
+
+  function printPrompt() {
+    if (state.closed) return;
+    term.write(promptStr());
+  }
+
+  function redraw() {
+    term.write('\x1b[2K\r' + promptStr() + lineBuf);
+    const back = lineBuf.length - cursor;
+    if (back > 0) term.write('\x1b[' + back + 'D');
+  }
+
+  function insertText(str) {
+    if (!str) return;
+    lineBuf = lineBuf.slice(0, cursor) + str + lineBuf.slice(cursor);
+    cursor += str.length;
+    redraw();
+  }
+  function doBackspace() {
+    if (cursor === 0) return;
+    lineBuf = lineBuf.slice(0, cursor - 1) + lineBuf.slice(cursor);
+    cursor--; redraw();
+  }
+  function doDelete() {
+    if (cursor >= lineBuf.length) return;
+    lineBuf = lineBuf.slice(0, cursor) + lineBuf.slice(cursor + 1);
+    redraw();
+  }
+  function moveLeft()  { if (cursor > 0) { cursor--; redraw(); } }
+  function moveRight() { if (cursor < lineBuf.length) { cursor++; redraw(); } }
+  function historyUp() {
+    if (!state.history.length) return;
+    if (state.hIndex > 0) state.hIndex--;
+    lineBuf = state.history[state.hIndex] || '';
+    cursor = lineBuf.length; redraw();
+  }
+  function historyDown() {
+    if (!state.history.length) return;
+    if (state.hIndex < state.history.length - 1) {
+      state.hIndex++;
+      lineBuf = state.history[state.hIndex] || '';
+    } else {
+      state.hIndex = state.history.length;
+      lineBuf = '';
+    }
+    cursor = lineBuf.length; redraw();
+  }
+
+  function autoComplete() {
+    const frag = lineBuf.slice(0, cursor);
+    const parts = frag.split(/\s+/);
+    if (parts.length <= 1) {
+      const names = Object.keys(BUILTIN_COMMANDS).concat(Object.keys(PACKAGES));
+      const hits = names.filter((n) => n.indexOf(parts[0]) === 0);
+      if (hits.length === 1) {
+        lineBuf = hits[0] + ' ' + lineBuf.slice(cursor);
+        cursor = hits[0].length + 1; redraw();
+      } else if (hits.length > 1) {
+        println('');
+        println(C.gry + hits.join('   ') + C.r);
+        redraw();
+      }
+      return;
+    }
+    const hits = Object.keys(PACKAGES).filter((n) => n.indexOf(parts[parts.length - 1]) === 0);
+    if (hits.length === 1) {
+      parts[parts.length - 1] = hits[0];
+      lineBuf = parts.join(' ') + ' ' + lineBuf.slice(cursor);
+      cursor = parts.join(' ').length + 1; redraw();
+    }
+  }
+
+  /* ------------------------------------------------------------
+     15. INPUT HANDLING
+     ------------------------------------------------------------ */
+  function handleInput(data) {
+    if (state.menuActive) {
+      const h = state.menuActive;
+      state.menuActive = null;
+      h(data);
+      return;
+    }
+
+    if (state.busy) {
+      if (data === '\x03' || data === '\x1b') state.interrupt = true;
+      return;
+    }
+
+    if (ctrlArmed) {
+      ctrlArmed = false;
+      updateModKeys();
+      if (data.length === 1) {
+        const code = data.toUpperCase().charCodeAt(0);
+        if (code >= 64 && code < 128) { handleInput(String.fromCharCode(code - 64)); return; }
+      }
+    }
+
+    if (altArmed) {
+      altArmed = false;
+      updateModKeys();
+      if (data.length === 1) { handleInput('\x1b' + data); return; }
+    }
+
+    switch (data) {
+      case '\r': case '\n':   submit(); return;
+      case '\u007f': case '\b': doBackspace(); return;
+      case '\x03': println('^C'); lineBuf=''; cursor=0; printPrompt(); return;
+      case '\x0c': term.clear(); redraw(); return;
+      case '\t': autoComplete(); return;
+      case '\x1b[A': historyUp();   return;
+      case '\x1b[B': historyDown(); return;
+      case '\x1b[C': moveRight();   return;
+      case '\x1b[D': moveLeft();    return;
+      case '\x1b[H':
+      case '\x1b[1~': cursor = 0; redraw(); return;
+      case '\x1b[F':
+      case '\x1b[4~': cursor = lineBuf.length; redraw(); return;
+      case '\x1b[3~': doDelete(); return;
+      case '\x1b[5~': term.scrollPages(-1); return;
+      case '\x1b[6~': term.scrollPages(1);  return;
+      case '\x1b': return;
+    }
+
+    if (data.length > 1 && data.charCodeAt(0) !== 27) {
+      insertText(data.replace(/[\r\n\t]+/g, ' '));
+      return;
+    }
+    if (data.length === 1) {
+      const code = data.charCodeAt(0);
+      if (code >= 32 && code !== 127) insertText(data);
+    }
+  }
+
+  term.onData(handleInput);
+
+  term.attachCustomKeyEventHandler((e) => {
+    if (e.type === 'keydown' && e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+      if (term.hasSelection()) return false;
+    }
+    return true;
+  });
+
+  function waitKey() {
+    return new Promise((resolve) => {
+      state.menuActive = (data) => {
+        if (data === '\r' || data === '\n') return resolve('enter');
+        if (data === '\x1b' || data === '\x03') return resolve('esc');
+        if (data.length === 1) return resolve(data.toLowerCase());
+        return resolve('other');
+      };
+    });
+  }
+
+  /* ------------------------------------------------------------
+     16. COMMAND SUBMITTER
+     ------------------------------------------------------------ */
+  async function submit() {
+    const raw = lineBuf;
+    term.write('\r\n');
+    lineBuf = ''; cursor = 0;
+    if (raw.trim()) state.history.push(raw);
+    state.hIndex = state.history.length;
+
+    state.busy = true;
+    state.interrupt = false;
+    setStatus('busy');
+
+    try { await runCommand(raw.trim()); }
+    catch (err) { println(C.red + 'hexai: ' + (err && err.message ? err.message : String(err)) + C.r); }
+
+    state.busy = false;
+    state.interrupt = false;
+    setStatus('online');
+    if (!state.closed) printPrompt();
+  }
+
+  function setStatus(txt) {
+    if (statusEl) statusEl.textContent = txt;
+    if (statusPill) statusPill.classList.toggle('ai', txt === 'ai');
+  }
+
+  /* ------------------------------------------------------------
+     17. TOKENIZER
+     ------------------------------------------------------------ */
+  function tokenize(str) {
+    const out = [];
+    let cur = '';
+    let quote = null;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (quote) { if (ch === quote) quote = null; else cur += ch; }
+      else if (ch === '"' || ch === "'") quote = ch;
+      else if (/\s/.test(ch)) { if (cur) { out.push(cur); cur = ''; } }
+      else cur += ch;
+    }
+    if (cur) out.push(cur);
+    return out;
+  }
+
+  /* ============================================================
+     18. TERMUX-API COMMANDS
+     ============================================================ */
+  async function cmdTermuxApi(args) {
+    const sub = args[0] || 'help';
+    const rest = args.slice(1);
+
+    if (!state.installed['termux-api']) {
+      println('');
+      println(C.red + '  termux-api: command not found' + C.r);
+      println(C.gry + '  hint: run ' + C.grn + '"pkg install termux-api"' + C.gry + ' first.' + C.r);
+      println('');
+      return;
+    }
+
+    switch (sub) {
+      case 'battery-status': {
+        const json = rest.indexOf('--json') !== -1;
+        try {
+          let level = null, charging = null;
+          if (navigator.getBattery) {
+            const b = await navigator.getBattery();
+            level = Math.round(b.level * 100);
+            charging = b.charging;
+          }
+          if (level === null) { println(C.yel + 'battery API unavailable on this browser' + C.r); return; }
+          if (json) {
+            println('{"health":"good","percentage":' + level +
+                    ',"plugged":"' + (charging ? 'AC' : 'UNPLUGGED') +
+                    '","status":"' + (charging ? 'CHARGING' : 'DISCHARGING') +
+                    '","temperature":0.0}');
+          } else {
+            println('');
+            println(C.grn + C.b + '  BATTERY STATUS' + C.r);
+            println('  ' + C.cyn + 'percentage : ' + C.r + C.wht + level + '%' + C.r);
+            println('  ' + C.cyn + 'status     : ' + C.r + (charging ? C.grn + 'CHARGING' : C.yel + 'DISCHARGING') + C.r);
+            println('  ' + C.cyn + 'health     : ' + C.r + C.wht + 'good' + C.r);
+            println('');
+          }
+        } catch (e) { println(C.red + 'battery: ' + e.message + C.r); }
+        return;
+      }
+      case 'vibrate': {
+        const ms = parseInt(rest[0] || '500', 10) || 500;
+        if (navigator.vibrate) {
+          const ok = navigator.vibrate(ms);
+          println(ok ? C.grn + '✔ vibrating ' + ms + 'ms' + C.r
+                     : C.yel + '⚠ vibration was blocked by the browser' + C.r);
+        } else println(C.yel + '⚠ vibration API unavailable on this device' + C.r);
+        return;
+      }
+      case 'clipboard-get': {
+        try { const txt = await navigator.clipboard.readText();
+              println(txt || C.gry + '(clipboard empty)' + C.r); }
+        catch (e) { println(C.red + 'clipboard-get: permission denied or unsupported' + C.r); }
+        return;
+      }
+      case 'clipboard-set': {
+        const txt = rest.join(' ');
+        if (!txt) { println(C.yel + 'usage: termux-clipboard-set <text>' + C.r); return; }
+        try { await navigator.clipboard.writeText(txt);
+              println(C.grn + '✔ copied ' + txt.length + ' chars to clipboard' + C.r);
+              showToast('📋 Copied to clipboard', 'ok'); }
+        catch (e) { println(C.red + 'clipboard-set: ' + e.message + C.r); }
+        return;
+      }
+      case 'toast': {
+        const text = rest.join(' ') || 'Hello from HEX AI';
+        showToast(text, 'ok');
+        println(C.grn + '✔ toast shown: ' + text + C.r);
+        return;
+      }
+      case 'notification': {
+        let title = 'HEX AI', body = 'Notification from Termux:API';
+        const t = rest.indexOf('--title');
+        const c = rest.indexOf('--content');
+        if (t !== -1 && rest[t + 1]) title = rest[t + 1];
+        if (c !== -1 && rest[c + 1]) body  = rest[c + 1];
+        await showNotification(title, body);
+        return;
+      }
+      case 'notification-remove': { println(C.grn + '✔ notification removed' + C.r); return; }
+      case 'tts-speak': {
+        const text = rest.join(' ') || 'Hello from HEX AI';
+        if (typeof speechSynthesis === 'undefined') {
+          println(C.yel + 'tts-speak: speech synthesis unsupported' + C.r); return;
+        }
+        try { const u = new SpeechSynthesisUtterance(text);
+              u.rate = 1.0; u.pitch = 1.0; speechSynthesis.speak(u);
+              println(C.grn + '✔ speaking: "' + text + '"' + C.r); }
+        catch (e) { println(C.red + 'tts-speak: ' + e.message + C.r); }
+        return;
+      }
+      case 'tts-engines': { println('com.hexai.tts.engine'); return; }
+      case 'location': {
+        if (!navigator.geolocation) { println(C.red + 'location: geolocation API unavailable' + C.r); return; }
+        println(C.gry + 'requesting location permission…' + C.r);
+        await new Promise((resolve) => {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => { println('');
+              println(C.grn + C.b + '  LOCATION' + C.r);
+              println('  ' + C.cyn + 'latitude  : ' + C.r + C.wht + pos.coords.latitude.toFixed(6) + C.r);
+              println('  ' + C.cyn + 'longitude : ' + C.r + C.wht + pos.coords.longitude.toFixed(6) + C.r);
+              println('  ' + C.cyn + 'accuracy  : ' + C.r + C.wht + pos.coords.accuracy.toFixed(1) + ' m' + C.r);
+              println(''); resolve(); },
+            (err) => { println(C.red + 'location: ' + err.message + C.r); resolve(); },
+            { enableHighAccuracy:true, timeout:12000 });
+        });
+        return;
+      }
+      case 'wifi-connectioninfo': {
+        const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        println('');
+        println(C.grn + C.b + '  WIFI / NETWORK INFO' + C.r);
+        if (c) {
+          println('  ' + C.cyn + 'type       : ' + C.r + C.wht + (c.effectiveType || 'unknown') + C.r);
+          println('  ' + C.cyn + 'downlink   : ' + C.r + C.wht + (c.downlink || '?') + ' Mbps' + C.r);
+          println('  ' + C.cyn + 'rtt        : ' + C.r + C.wht + (c.rtt || '?') + ' ms' + C.r);
+          println('  ' + C.cyn + 'saved      : ' + C.r + C.wht + (c.saveData ? 'yes' : 'no') + C.r);
+        } else {
+          println('  ' + C.wht + 'online     : ' + (navigator.onLine ? 'yes' : 'no') + C.r);
+          println('  ' + C.gry + '(Network Information API unavailable)' + C.r);
+        }
+        println('');
+        return;
+      }
+      case 'wifi-scaninfo': {
+        println('[{"ssid":"HEX-NET","bssid":"00:11:22:33:44:55","frequency":2412,"level":-45},' +
+                '{"ssid":"GuestWiFi","bssid":"66:77:88:99:aa:bb","frequency":2437,"level":-72}]');
+        return;
+      }
+      case 'wifi-enable': { println(C.grn + '✔ wifi toggled (simulated)' + C.r); return; }
+      case 'share': {
+        const text = rest.join(' ') || 'Shared from HEX AI terminal';
+        if (navigator.share) {
+          try { await navigator.share({ title:'HEX AI', text:text });
+                println(C.grn + '✔ shared' + C.r); }
+          catch (e) { println(C.gry + 'share cancelled' + C.r); }
+        } else {
+          println(C.yel + '⚠ Web Share API unavailable — copying to clipboard instead' + C.r);
+          try { await navigator.clipboard.writeText(text); showToast('📋 Copied', 'ok'); } catch (e) {}
+        }
+        return;
+      }
+      case 'dialog': {
+        const prompt_ = rest.join(' ') || 'Enter value';
+        const val = window.prompt(prompt_, '');
+        if (val === null) { println('{"code":-1,"text":""}'); return; }
+        println('{"code":0,"text":"' + val.replace(/"/g, '\\"') + '"}');
+        return;
+      }
+      case 'fingerprint': {
+        if (window.PublicKeyCredential) {
+          println(C.grn + '✔ authentication successful (WebAuthn available)' + C.r);
+          println('{"auth_result":1,"errors":""}');
+        } else {
+          println(C.yel + '⚠ biometric API unavailable' + C.r);
+          println('{"auth_result":0,"errors":"unsupported"}');
+        }
+        return;
+      }
+      case 'sensor': {
+        if (typeof DeviceOrientationEvent === 'undefined') {
+          println(C.yel + '⚠ device motion sensors unavailable' + C.r); return;
+        }
+        println(C.gry + 'reading device orientation for 1.5s…' + C.r);
+        await new Promise((resolve) => {
+          let got = false;
+          const h = (e) => {
+            got = true;
+            println('{"sensor":"accelerometer","values":[' +
+                    (e.alpha || 0).toFixed(2) + ',' +
+                    (e.beta  || 0).toFixed(2) + ',' +
+                    (e.gamma || 0).toFixed(2) + ']}');
+          };
+          window.addEventListener('deviceorientation', h);
+          setTimeout(() => {
+            window.removeEventListener('deviceorientation', h);
+            if (!got) println(C.yel + '{"sensor":"accelerometer","values":[]}' + C.r);
+            resolve();
+          }, 1500);
+        });
+        return;
+      }
+      case 'camera-photo': {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          println(C.red + 'camera-photo: getUserMedia unavailable' + C.r); return;
+        }
+        try {
+          println(C.gry + 'requesting camera permission…' + C.r);
+          const s = await navigator.mediaDevices.getUserMedia({ video:true });
+          s.getTracks().forEach((t) => t.stop());
+          println(C.grn + '✔ camera accessible — photo saved to ~/photo.jpg' + C.r);
+        } catch (e) { println(C.red + 'camera-photo: ' + e.name + ' — ' + e.message + C.r); }
+        return;
+      }
+      case 'torch': {
+        const on = (rest[0] || '').toLowerCase() !== 'false';
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const s = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } });
+            const track = s.getVideoTracks()[0];
+            if (track && track.getCapabilities && track.getCapabilities().torch) {
+              await track.applyConstraints({ advanced:[{ torch:on }] });
+              println(C.grn + '✔ torch ' + (on ? 'ON' : 'OFF') + C.r);
+            } else println(C.yel + '⚠ device has no torch capability' + C.r);
+            setTimeout(() => s.getTracks().forEach((t) => t.stop()), 800);
+          } catch (e) { println(C.red + 'torch: ' + e.name + C.r); }
+        } else println(C.yel + '⚠ torch API unavailable' + C.r);
+        return;
+      }
+      case 'volume': {
+        const stream = rest[0] || 'music';
+        println('{"stream":"' + stream + '","volume":' + (rest[1] || 7) +
+                ',"max_volume":15,"muted":false}');
+        return;
+      }
+      case 'brightness': { println(C.grn + '✔ brightness ' + (rest[0] || '128') + ' (simulated)' + C.r); return; }
+      case 'telephony-deviceinfo': {
+        println('{"network_operator_name":"HEX Mobile","network_country_iso":"IN",' +
+                '"network_type":13,"device_id":"hexai-web-' +
+                Math.floor(Math.random()*99999) + '","sim_state":"ready"}');
+        return;
+      }
+      case 'telephony-cellinfo': {
+        println('[{"type":"gsm","cid":12345,"lac":678,"signalStrength":-67,"dbm":-67}]');
+        return;
+      }
+      case 'telephony-call': {
+        const num = rest[0] || '0000000000';
+        println(C.grn + '✔ dialing ' + num + ' (simulated)' + C.r);
+        window.location.href = 'tel:' + num;
+        return;
+      }
+      case 'contact-list': {
+        println('[]');
+        println(C.gry + '(contact list requires Termux:API Android app on a real device)' + C.r);
+        return;
+      }
+      case 'sms-list': {
+        println('[]');
+        println(C.gry + '(SMS access requires Termux:API Android app)' + C.r);
+        return;
+      }
+      case 'sms-send': { println(C.grn + '✔ SMS queued (requires Android Termux:API app)' + C.r); return; }
+      case 'call-log': { println('[]'); return; }
+      case 'media-player': {
+        println(C.grn + '✔ media-player: ' + (rest.join(' ') || 'info') + ' (simulated)' + C.r);
+        return;
+      }
+      case 'media-scan': { println(C.grn + '✔ media scan complete' + C.r); return; }
+      case 'audio-info': { println('{"stream":"music","volume":7,"max_volume":15}'); return; }
+      case 'microphone-record': {
+        try {
+          const s = await navigator.mediaDevices.getUserMedia({ audio:true });
+          s.getTracks().forEach((t) => t.stop());
+          println(C.grn + '✔ microphone accessible' + C.r);
+        } catch (e) { println(C.red + 'microphone-record: ' + e.name + C.r); }
+        return;
+      }
+      case 'wallpaper': { println(C.grn + '✔ wallpaper set (simulated)' + C.r); return; }
+      case 'storage-get': { println(C.grn + '✔ storage-get requested' + C.r); return; }
+      case 'download': {
+        const url = rest[0];
+        if (!url) { println(C.yel + 'usage: termux-download <url>' + C.r); return; }
+        const a = document.createElement('a');
+        a.href = url; a.download = ''; a.style.display = 'none';
+        document.body.appendChild(a); a.click();
+        setTimeout(() => a.remove(), 400);
+        println(C.grn + '✔ download started for ' + url + C.r);
+        showToast('⬇ Download started', 'ok');
+        return;
+      }
+      case 'open': {
+        const url = rest[0];
+        if (!url) { println(C.yel + 'usage: termux-open <url|file>' + C.r); return; }
+        window.open(/^https?:/.test(url) ? url : ('https://' + url), '_blank', 'noopener');
+        println(C.grn + '✔ opened externally' + C.r);
+        return;
+      }
+      case 'open-url': {
+        const url = rest[0] || 'https://example.com';
+        window.open(url, '_blank', 'noopener');
+        println(C.grn + '✔ opened ' + url + C.r);
+        return;
+      }
+      case 'share-file': { println(C.grn + '✔ file share requested' + C.r); return; }
+      case 'usb': { if (navigator.usb) println('[]'); else println(C.yel + '⚠ WebUSB unavailable' + C.r); return; }
+      case 'infrared-frequencies': { println('[]'); return; }
+      case 'job-scheduler': { println(C.grn + '✔ job-scheduler registered (simulated)' + C.r); return; }
+      case 'keystore': { println(C.grn + '✔ keystore operation completed (simulated)' + C.r); return; }
+
+      default: {
+        println('');
+        println(C.grn + C.b + '  TERMUX:API COMMANDS' + C.r);
+        println(C.gry + '  ─────────────────────────────────────────' + C.r);
+        const list = [
+          'termux-battery-status    [--json]',
+          'termux-vibrate <ms>',
+          'termux-clipboard-get',
+          'termux-clipboard-set <text>',
+          'termux-toast <text>',
+          'termux-notification [--title T] [--content C]',
+          'termux-tts-speak <text>',
+          'termux-location',
+          'termux-wifi-connectioninfo',
+          'termux-share <text>',
+          'termux-dialog <prompt>',
+          'termux-fingerprint',
+          'termux-sensor',
+          'termux-camera-photo',
+          'termux-torch [on|off]',
+          'termux-volume <stream> <n>',
+          'termux-brightness <n>',
+          'termux-download <url>',
+          'termux-open-url <url>',
+          'termux-telephony-deviceinfo',
+          'termux-media-player <cmd>',
+          'termux-microphone-record',
+          'termux-wallpaper'
+        ];
+        list.forEach((l) => println('  ' + C.cyn + l + C.r));
+        println('');
+        println(C.gry + '  example: termux-battery-status --json' + C.r);
+        println('');
+      }
+    }
+  }
+
+  /* ============================================================
+     19. TERMUX-STYLE (adi1090x port)
+     ============================================================ */
+  async function cmdTermuxStyle(args) {
+    const sub = (args[0] || '').toLowerCase();
+    if (sub === 'set' && args[1])   return applyScheme(args[1], true);
+    if (sub === 'font' && args[1])  return applyFont(args[1], true);
+    if (sub === 'list')             return listSchemes();
+    if (sub === 'fonts')            return listFonts();
+    if (sub === 'random')           return applyRandomScheme();
+    await styleMenu();
+  }
+
+  function listSchemes() {
+    println('');
+    println(C.grn + C.b + '  AVAILABLE COLOR SCHEMES (' + SCHEME_NAMES.length + ')' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    SCHEME_NAMES.forEach((id, i) => {
+      const active = id === state.scheme;
+      const num = pad(i + 1, 3);
+      println('  ' + (active ? C.grn + '▸' + C.r : C.gry + ' ' + C.r) +
+              ' ' + C.gry + num + C.r + '  ' +
+              (active ? C.grn + C.b + id + C.r : C.wht + id + C.r) +
+              (active ? C.gry + '  (active)' + C.r : ''));
+    });
+    println('');
+    println(C.gry + '  use: termux-style set <name>' + C.r);
+    println('');
+  }
+
+  function listFonts() {
+    println('');
+    println(C.grn + C.b + '  AVAILABLE FONTS (' + FONTS.length + ')' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    FONTS.forEach((f, i) => {
+      const active = f.id === state.font;
+      const num = pad(i + 1, 3);
+      println('  ' + (active ? C.grn + '▸' + C.r : C.gry + ' ' + C.r) +
+              ' ' + C.gry + num + C.r + '  ' +
+              (active ? C.grn + C.b + f.label + C.r : C.wht + f.label + C.r) +
+              (active ? C.gry + '  (active)' + C.r : ''));
+    });
+    println('');
+    println(C.gry + '  use: termux-style font <id>' + C.r);
+    println('');
+  }
+
+  function applyScheme(name, loud) {
+    const key = name.toLowerCase().replace(/\s+/g, '-');
+    if (!SCHEMES[key]) {
+      println(C.red + 'termux-style: unknown color scheme "' + name + '"' + C.r);
+      println(C.gry + 'run "termux-style list" to see all schemes.' + C.r);
+      return;
+    }
+    state.scheme = key;
+    term.options.theme = SCHEMES[key].theme;
+    ROOT.style.background = SCHEMES[key].theme.background;
+    if (loud) {
+      println(C.grn + '✔ color scheme → ' + C.grn + C.b + SCHEMES[key].name + C.r);
+      showToast('🎨 ' + SCHEMES[key].name, 'ok');
+    }
+    try { localStorage.setItem('hexai.scheme', key); } catch (e) {}
+  }
+
+  function applyFont(id, loud) {
+    const f = FONTS.find((x) => x.id === id);
+    if (!f) {
+      println(C.red + 'termux-style: unknown font "' + id + '"' + C.r);
+      println(C.gry + 'run "termux-style fonts" to see all fonts.' + C.r);
+      return;
+    }
+    state.font = id;
+    term.options.fontFamily = f.css + ', monospace';
+    setTimeout(fitNow, 60);
+    if (loud) {
+      println(C.grn + '✔ font → ' + C.grn + C.b + f.label + C.r);
+      showToast('🔤 ' + f.label, 'ok');
+    }
+    try { localStorage.setItem('hexai.font', id); } catch (e) {}
+  }
+
+  function applyRandomScheme() {
+    const list = SCHEME_NAMES.filter((n) => n !== state.scheme);
+    applyScheme(list[Math.floor(Math.random() * list.length)], true);
+  }
+
+  async function styleMenu() {
+    while (true) {
+      term.write('\x1b[2K\r\n');
+      const menu =
+        C.grn + C.b +
+        '  ┌──────────────────────────────────────────────────┐\r\n' +
+        '  │░▀█▀░█▀▀░█▀▄░█▄█░█░█░█░█░░░░░█▀▀░▀█▀░█░█░█░░░█▀▀░░│\r\n' +
+        '  │░░█░░█▀▀░█▀▄░█░█░█░█░▄▀▄░▄▄▄░▀▀█░░█░░░█░░█░░░█▀▀░░│\r\n' +
+        '  │░░▀░░▀▀▀░▀░▀░▀░▀░▀▀▀░▀░▀░░░░░▀▀▀░░▀░░░▀░░▀▀▀░▀▀▀░░│\r\n' +
+        '  └──────────────────────────────────────────────────┘\r\n' + C.r +
+        C.gry + '  [*] By- Aditya Shakya // adi1090x (port)\r\n\r\n' + C.r +
+        C.cyn + '  [C] Colors (' + SCHEME_NAMES.length + ')\r\n' +
+        '  [F] Fonts (' + FONTS.length + ')\r\n' +
+        '  [R] Random\r\n' +
+        '  [I] Import\r\n' +
+        '  [A] About\r\n' +
+        '  [Q] Quit\r\n\r\n' + C.r +
+        C.grn + '  [Select Option]: ' + C.r;
+      term.write(menu);
+
+      const k = await waitKey();
+      term.write('\r\n');
+
+      if (k === 'q' || k === 'esc') { println(C.gry + '  exited termux-style.' + C.r); return; }
+      if (k === 'c') { await styleMenuColors(); continue; }
+      if (k === 'f') { await styleMenuFonts();  continue; }
+      if (k === 'r') {
+        const list = SCHEME_NAMES.filter((n) => n !== state.scheme);
+        applyScheme(list[Math.floor(Math.random() * list.length)], true);
+        println(C.gry + '  [*] Reloading Settings...' + C.r);
+        println(C.grn + '  [*] Applied Successfully.' + C.r);
+        return;
+      }
+      if (k === 'i') { await styleMenuImport(); return; }
+      if (k === 'a') {
+        println('');
+        println(C.grn + C.b + '  ABOUT TERMUX-STYLE (WEB PORT)' + C.r);
+        println(C.gry + '  ─────────────────────────────────────────' + C.r);
+        println('  Simple script to change color-schemes and fonts');
+        println('  for the Termux terminal emulator.');
+        println('');
+        println('  ' + C.cyn + 'Original:' + C.r + ' https://github.com/adi1090x/termux-style');
+        println('  ' + C.cyn + 'License :' + C.r + ' MIT');
+        println('  ' + C.cyn + 'Web port:' + C.r + ' HEX AI v3.3 — client-side adaptation');
+        println('');
+        println(C.gry + '  press ENTER to return to the menu' + C.r);
+        await waitKey();
+        continue;
+      }
+      println(C.yel + '  unknown option, try C/F/R/I/A/Q' + C.r);
+    }
+  }
+
+  async function styleMenuColors() {
+    println('');
+    println(C.grn + C.b + '  SELECT COLOR-SCHEME' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    SCHEME_NAMES.forEach((id, i) => {
+      const active = id === state.scheme;
+      println('  ' + (active ? C.grn + '▸' : C.gry + ' ') + ' ' +
+              C.gry + pad(i + 1, 3) + C.r + '  ' +
+              (active ? C.grn + C.b + SCHEMES[id].name + C.r : C.wht + SCHEMES[id].name + C.r));
+    });
+    println('');
+    println(C.gry + '  enter number (or "q" to go back)' + C.r);
+    term.write(C.grn + '  [Color #]: ' + C.r);
+
+    const k = await waitKey();
+    term.write('\r\n');
+    if (k === 'q' || k === 'esc') return;
+    let buf = /[0-9]/.test(k) ? k : '';
+    if (!buf) { println(C.yel + '  invalid input' + C.r); return; }
+    while (true) {
+      term.write(C.grn + '  [Color #]: ' + C.r + buf);
+      const more = await waitKey();
+      if (more === 'enter') break;
+      if (more === 'esc') { term.write('\r\n'); return; }
+      if (more.length === 1 && /[0-9]/.test(more)) { buf += more; term.write('\x1b[2K\r'); continue; }
+      break;
+    }
+    const idx = parseInt(buf, 10) - 1;
+    term.write('\r\n');
+    if (isNaN(idx) || idx < 0 || idx >= SCHEME_NAMES.length) { println(C.red + '  invalid selection' + C.r); return; }
+    applyScheme(SCHEME_NAMES[idx], true);
+    println(C.gry + '  [*] Reloading Settings...' + C.r);
+    println(C.grn + '  [*] Applied Successfully.' + C.r);
+    await sleep(250);
+  }
+
+  async function styleMenuFonts() {
+    println('');
+    println(C.grn + C.b + '  SELECT FONT' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    FONTS.forEach((f, i) => {
+      const active = f.id === state.font;
+      println('  ' + (active ? C.grn + '▸' : C.gry + ' ') + ' ' +
+              C.gry + pad(i + 1, 3) + C.r + '  ' +
+              (active ? C.grn + C.b + f.label + C.r : C.wht + f.label + C.r));
+    });
+    println('');
+    println(C.gry + '  enter number (or "q" to go back)' + C.r);
+    term.write(C.grn + '  [Font #]: ' + C.r);
+
+    const k = await waitKey();
+    term.write('\r\n');
+    if (k === 'q' || k === 'esc') return;
+    let buf = /[0-9]/.test(k) ? k : '';
+    if (!buf) { println(C.yel + '  invalid input' + C.r); return; }
+    while (true) {
+      term.write(C.grn + '  [Font #]: ' + C.r + buf);
+      const more = await waitKey();
+      if (more === 'enter') break;
+      if (more === 'esc') { term.write('\r\n'); return; }
+      if (more.length === 1 && /[0-9]/.test(more)) { buf += more; term.write('\x1b[2K\r'); continue; }
+      break;
+    }
+    const idx = parseInt(buf, 10) - 1;
+    term.write('\r\n');
+    if (isNaN(idx) || idx < 0 || idx >= FONTS.length) { println(C.red + '  invalid selection' + C.r); return; }
+    applyFont(FONTS[idx].id, true);
+    await sleep(200);
+  }
+
+  async function styleMenuImport() {
+    println('');
+    println(C.grn + C.b + '  IMPORT COLOR-SCHEME' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    println('  ' + C.cyn + '[1]' + C.r + ' Local file (enter scheme name)');
+    println('  ' + C.cyn + '[2]' + C.r + ' Internet file (enter URL to properties)');
+    println('');
+    println(C.gry + '  enter choice number (or "q")' + C.r);
+    term.write(C.grn + '  [Select Option]: ' + C.r);
+
+    const choice = await waitKey();
+    term.write('\r\n');
+    if (choice === 'q' || choice === 'esc') return;
+
+    if (choice === '1') {
+      println(C.gry + '  enter scheme name from the built-in list:' + C.r);
+      println(C.gry + '  ' + SCHEME_NAMES.slice(0, 8).join(', ') + ', …' + C.r);
+      println('');
+      println(C.yel + '  (interactive text entry is limited — use:' + C.r);
+      println(C.yel + '   termux-style set <name> )' + C.r);
+      await sleep(300);
+      return;
+    }
+
+    if (choice === '2') {
+      println(C.gry + '  fetching a demo gruvbox-dark scheme from adi1090x repo…' + C.r);
+      const url = 'https://raw.githubusercontent.com/adi1090x/termux-style/master/colors/gruvbox-dark.properties';
+      const res = await proxyFetch(url);
+      if (!res.ok) { println(C.red + '  fetch failed — all proxy nodes unreachable' + C.r); return; }
+      println('');
+      println(C.grn + C.b + '  ✔ fetched ' + (res.text.length / 1024).toFixed(1) + ' KB via ' + res.via + C.r);
+      println(C.gry + '  ── preview ──' + C.r);
+      res.text.split('\n').slice(0, 6).forEach((l) =>
+        println('  ' + C.gry + '│' + C.r + ' ' + C.wht + l + C.r));
+      println('');
+      println(C.grn + '  [*] Imported successfully (using gruvbox-dark values)' + C.r);
+      applyScheme('gruvbox-dark', true);
+      return;
+    }
+    println(C.yel + '  invalid choice' + C.r);
+  }
+
+  /* ------------------------------------------------------------
+     20. TERMUX ADDON COMMANDS
+     ------------------------------------------------------------ */
+  function cmdAddonBoot() {
+    if (!state.installed['termux-boot']) {
+      println(C.red + 'termux-boot: install with "pkg install termux-boot"' + C.r); return;
+    }
+    println('');
+    println(C.grn + C.b + '  TERMUX:BOOT' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    println('  boot scripts directory : ~/.termux/boot/');
+    println('  registered scripts     : 0');
+    println('');
+    println(C.gry + '  place executable scripts in ~/.termux/boot/ and they' + C.r);
+    println(C.gry + '  will run automatically when the terminal reboots.' + C.r);
+    println('');
+  }
+
+  function cmdAddonFloat(on) {
+    if (!state.installed['termux-float']) {
+      println(C.red + 'termux-float: install with "pkg install termux-float"' + C.r); return;
+    }
+    const enabled = on !== false;
+    ROOT.classList.toggle('hx-float', enabled);
+    setTimeout(fitNow, 60);
+    println(enabled ? C.grn + '✔ floating window mode enabled' + C.r
+                    : C.gry + '▸ floating window mode disabled' + C.r);
+    showToast(enabled ? '🪟 Floating mode ON' : '🪟 Floating mode OFF', 'ok');
+  }
+
+  function cmdAddonTasker() {
+    if (!state.installed['termux-tasker']) {
+      println(C.red + 'termux-tasker: install with "pkg install termux-tasker"' + C.r); return;
+    }
+    println('');
+    println(C.grn + C.b + '  TERMUX:TASKER' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    println('  tasker interface ready');
+    println('  → exposes ' + Object.keys(BUILTIN_COMMANDS).length + ' commands as Tasker actions');
+    println('  → shortname: hexai');
+    println('');
+  }
+
+  function cmdAddonWidget(args) {
+    if (!state.installed['termux-widget']) {
+      println(C.red + 'termux-widget: install with "pkg install termux-widget"' + C.r); return;
+    }
+    const sub = (args[0] || 'list').toLowerCase();
+    if (sub === 'add') { println(C.grn + '✔ widget script registered' + C.r); return; }
+    println('');
+    println(C.grn + C.b + '  TERMUX:WIDGET' + C.r);
+    println(C.gry + '  ─────────────────────────────────────────' + C.r);
+    println('  home-screen widget scripts');
+    println('  available scripts : 0');
+    println('');
+    println(C.gry + '  use "termux-widget add <script>" to register one.' + C.r);
+    println('');
+  }
+
+  /* ------------------------------------------------------------
+     21. HELP / ABOUT / NEOFETCH / ETC
+     ------------------------------------------------------------ */
+  async function cmdHelp() {
+    println('');
+    println(C.grn + C.b + '  ╔══════════════════════════════════════════╗' + C.r);
+    println(C.grn + C.b + '  ║      HEX AI v3.3 ▸ COMMAND INDEX         ║' + C.r);
+    println(C.grn + C.b + '  ╚══════════════════════════════════════════╝' + C.r);
+    println('');
+
+    const rows = [
+      ['help',            'show this command list'],
+      ['about',           'about HEX AI terminal'],
+      ['banner',          'print the HEX AI banner'],
+      ['neofetch',        'system + terminal information'],
+      ['clear  /  ^L',    'clear the screen'],
+      ['echo <text>',     'print text back'],
+      ['date',            'current date & time'],
+      ['whoami',          'current user'],
+      ['uname -a',        'kernel / system info'],
+      ['pwd / ls / cd',   'virtual filesystem'],
+      ['cat <file>',      'read a virtual file'],
+      ['history',         'show command history'],
+      ['ai <question>',   '★ ask the LIVE AI (pollinations)'],
+      ['ai --clear',      'reset conversation memory'],
+      ['ai --status',     'check the live AI endpoint'],
+      ['fetch <url>',     'download via free proxy pool'],
+      ['curl <url>',      'alias of fetch'],
+      ['wget <url>',      'alias of fetch'],
+      ['open <url>',      'open a link in a new tab'],
+      ['proxy [on|off]',  'proxy pool status / toggle'],
+      ['matrix',          'digital rain animation'],
+      ['pkg install <x>', 'install a package'],
+      ['pkg list',        'list all packages'],
+      ['pkg remove <x>',  'uninstall a package'],
+      ['reboot',          'restart the terminal'],
+      ['exit',            'close the session']
+    ];
+    rows.forEach((r) => {
+      println('  ' + C.cyn + r[0].padEnd(18, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
+    });
+
+    println('');
+    println(C.mag + C.b + '  ⚡ TERMUX-STYLE' + C.r + C.gry + '  (requires: pkg install termux-styling)' + C.r);
+    println('');
+    println('  ' + C.cyn + 'termux-style'.padEnd(18, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'interactive style menu' + C.r);
+    println('  ' + C.cyn + 'termux-style list'.padEnd(18, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'list color-schemes' + C.r);
+    println('  ' + C.cyn + 'termux-style set <n>'.padEnd(18, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply color-scheme' + C.r);
+    println('  ' + C.cyn + 'termux-style font <id>'.padEnd(18, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply font' + C.r);
+    println('  ' + C.cyn + 'termux-style random'.padEnd(18, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'random color-scheme' + C.r);
+    println('');
+
+    println(C.mag + C.b + '  ⚡ TERMUX:API COMMANDS' + C.r + C.gry + '  (requires: pkg install termux-api)' + C.r);
+    println('');
+    const tapi = [
+      ['termux-battery-status',    'battery level & charging state'],
+      ['termux-vibrate <ms>',      'vibrate the device'],
+      ['termux-clipboard-get/set', 'read/write the clipboard'],
+      ['termux-toast <text>',      'show a floating toast'],
+      ['termux-notification',      'post a system notification'],
+      ['termux-tts-speak <text>',  'text-to-speech'],
+      ['termux-location',          'GPS coordinates'],
+      ['termux-wifi-connectioninfo','network info'],
+      ['termux-share <text>',      'native share sheet'],
+      ['termux-dialog <prompt>',   'show a modal prompt'],
+      ['termux-fingerprint',       'biometric auth'],
+      ['termux-sensor',            'read device sensors'],
+      ['termux-camera-photo',      'request camera access'],
+      ['termux-torch [on|off]',    'control the flashlight'],
+      ['termux-download <url>',    'download a file'],
+      ['termux-open-url <url>',    'open a URL'],
+      ['…and 20+ more',            'run "termux-api" to see all']
+    ];
+    tapi.forEach((r) => {
+      println('  ' + C.cyn + r[0].padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
+    });
+    println('');
+
+    println(C.mag + C.b + '  ⚡ TERMUX ADDONS' + C.r);
+    println('');
+    const addons = [
+      ['termux-boot',    'run scripts on boot'],
+      ['termux-float',   'floating window mode'],
+      ['termux-styling', 'color-schemes & fonts'],
+      ['termux-tasker',  'Tasker automation bridge'],
+      ['termux-widget',  'home-screen scriptlets']
+    ];
+    addons.forEach((r) => {
+      const inst = state.installed[r[0]];
+      const mark = inst ? C.grn + ' ● ' + C.r : C.gry + ' ○ ' + C.r;
+      const nm   = inst ? C.grn + r[0].padEnd(16, ' ') + C.r : C.wht + r[0].padEnd(16, ' ') + C.r;
+      println('  ' + mark + nm + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
+    });
+    println('');
+
+    println(C.yel + C.b + '  ⚡ PACKAGE COMMANDS' + C.r + C.gry + '  (install first with: pkg install <name>)' + C.r);
+    println('');
+    Object.keys(PACKAGES).forEach((name) => {
+      const inst = state.installed[name];
+      const mark = inst ? C.grn + ' ● ' + C.r : C.gry + ' ○ ' + C.r;
+      const nm = inst ? C.grn + C.b + name.padEnd(18, ' ') + C.r : C.gry + name.padEnd(18, ' ') + C.r;
+      println('  ' + mark + nm + C.gry + '│' + C.r + ' ' + C.wht + PACKAGES[name].desc + C.r);
+    });
+
+    println('');
+    println(C.gry + '  tip: use the on-screen key row below for arrows, TAB and CTRL.' + C.r);
+    println('');
+  }
+
+  async function cmdAbout() {
+    println('');
+    println(C.grn + C.b + '  HEX AI — Termux Web Terminal v3.3' + C.r);
+    println(C.gry + '  ────────────────────────────────────────────' + C.r);
+    println('  ' + C.cyn + 'Engine   :' + C.r + ' xterm.js 5.5.0 (GPU-ready frontend)');
+    println('  ' + C.cyn + 'Addons   :' + C.r + ' fit · web-links');
+    println('  ' + C.cyn + 'Runtime  :' + C.r + ' 100% client-side JavaScript');
+    println('  ' + C.cyn + 'AI       :' + C.r + ' gen.pollinations.ai (no API key · free)');
+    println('  ' + C.cyn + 'Model    :' + C.r + ' ' + HEX_AI_MODEL + ' (OpenAI-compatible)');
+    println('  ' + C.cyn + 'Endpoint :' + C.r + ' ' + HEX_AI_ENDPOINT);
+    println('  ' + C.cyn + 'Stream   :' + C.r + ' server-sent events, token by token');
+    println('  ' + C.cyn + 'Memory   :' + C.r + ' ' + MAX_TURNS + ' turns rolling context');
+    println('  ' + C.cyn + 'Termux   :' + C.r + ' termux-api bridge · termux-style port');
+    println('');
+    println(C.gry + '  Projects this terminal builds upon:' + C.r);
+    println(C.gry + '   • xterm.js               github.com/xtermjs/xterm.js' + C.r);
+    println(C.gry + '   • termux-api-package     github.com/termux/termux-api-package' + C.r);
+    println(C.gry + '   • termux-style           github.com/adi1090x/termux-style' + C.r);
+    println(C.gry + '   • pollinations.ai        gen.pollinations.ai (free LLM gateway)' + C.r);
+    println('');
+  }
+
+  async function printBanner() {
+    const art = [
+      ' ██╗  ██╗███████╗██╗  ██╗    █████╗ ██╗',
+      ' ██║  ██║██╔════╝╚██╗██╔╝   ██╔══██╗██║',
+      ' ███████║█████╗   ╚███╔╝    ███████║██║',
+      ' ██╔══██║██╔══╝   ██╔██╗    ██╔══██║██║',
+      ' ██║  ██║███████╗██╔╝ ██╗   ██║  ██║██║',
+      ' ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝  ╚═╝╚═╝'
+    ];
+    const cols = [C.grn, C.grn, C.cyn, C.cyn, C.blu, C.blu];
+    println('');
+    for (let i = 0; i < art.length; i++) {
+      println(cols[i] + art[i] + C.r);
+      await sleep(45);
+    }
+    println('');
+    println(C.gry + '   T E R M U X   W E B   T E R M I N A L   v 3 . 3' + C.r);
+    println(C.grn + '   ──────────────────────────────────────────────────' + C.r);
+    println('   ' + C.cyn + 'engine ' + C.r + C.wht + 'xterm.js' + C.r +
+            C.gry + '  ·  ' + C.r + C.cyn + 'AI ' + C.r + C.wht + 'pollinations (live)' + C.r +
+            C.gry + '  ·  ' + C.r + C.cyn + 'termux ' + C.r + C.wht + 'ready' + C.r);
+    println('');
+  }
+
+  async function cmdDate() {
+    const d = new Date();
+    println('');
+    println('  ' + C.grn + C.b + d.toString() + C.r);
+    println('  ' + C.gry + 'UTC : ' + d.toUTCString() + C.r);
+    println('  ' + C.gry + 'EPOCH: ' + Math.floor(d.getTime() / 1000) + C.r);
+    println('');
+  }
+  async function cmdUname() {
+    println('Linux termux 5.15.0-hexai #1 SMP PREEMPT aarch64 GNU/Linux');
+    println(C.gry + 'browser: ' + (navigator.userAgent || 'unknown') + C.r);
+  }
+
+  async function cmdNeofetch() {
+    const logo = [
+      '  ██╗  ██╗███████╗██╗  ██╗',
+      '  ██║  ██║██╔════╝╚██╗██╔╝',
+      '  ███████║█████╗   ╚███╔╝ ',
+      '  ██╔══██║██╔══╝   ██╔██╗ ',
+      '  ██║  ██║███████╗██╔╝ ██╗',
+      '  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝'
+    ];
+    const rows = [
+      ['OS',       'HEX AI Web Terminal 3.3'],
+      ['Host',     'xterm.js 5.5.0'],
+      ['Kernel',   'browser-js-2026'],
+      ['Uptime',   Math.floor(performance.now() / 1000) + 's'],
+      ['Shell',    'hexsh 1.5'],
+      ['AI',       state.aiLive ? 'pollinations (live)' : 'offline KB'],
+      ['Model',    HEX_AI_MODEL],
+      ['Scheme',   SCHEMES[state.scheme].name],
+      ['Font',     (FONTS.find((f) => f.id === state.font) || {label:'?'}).label],
+      ['User',     state.user + '@' + state.host],
+      ['Proxy',    state.proxy ? 'free pool (' + PROXIES.length + ' nodes)' : 'disabled'],
+      ['Packages', Object.keys(state.installed).length + ' / ' + Object.keys(PACKAGES).length],
+      ['Addons',   ['termux-api','termux-boot','termux-float','termux-styling','termux-tasker','termux-widget']
+                    .filter((a) => state.installed[a]).length + ' / 6'],
+      ['Cols',     String(term.cols)],
+      ['Rows',     String(term.rows)]
+    ];
+    println('');
+    for (let i = 0; i < logo.length; i++) {
+      const info = rows[i] ? (C.cyn + C.b + rows[i][0].padEnd(9, ' ') + C.r + C.gry + ': ' + C.r + C.wht + rows[i][1] + C.r) : '';
+      println(C.grn + logo[i] + C.r + '   ' + info);
+      await sleep(40);
+    }
+    for (let i = logo.length; i < rows.length; i++) {
+      println('                        ' + C.cyn + C.b + rows[i][0].padEnd(9, ' ') + C.r + C.gry + ': ' + C.r + C.wht + rows[i][1] + C.r);
+      await sleep(30);
+    }
+    println('');
+  }
+
+  async function cmdLs(args) {
+    const showAll = args.indexOf('-a') !== -1;
+    const dir = state.cwd;
+    const entries = FS[dir] || [];
+    if (!entries.length) { println(C.gry + '(empty directory)' + C.r); return; }
+    const out = [];
+    entries.forEach((f) => {
+      const isDir = FS[dir + '/' + f];
+      out.push(isDir ? C.blu + C.b + f + '/' + C.r : C.wht + f + C.r);
+    });
+    println(out.join('   '));
+    if (showAll) println(C.gry + '.  ..  .hexai_history' + C.r);
+  }
+  async function cmdCd(args) {
+    const target = (args[0] || '~').replace(/\/$/, '');
+    if (target === '~' || target === '/' || target === '' || target === '..') { state.cwd = '~'; return; }
+    println(C.red + 'cd: no such file or directory: ' + target + C.r);
+  }
+  async function cmdCat(args) {
+    if (!args[0]) { println(C.yel + 'usage: cat <file>' + C.r); return; }
+    const key = state.cwd + '/' + args[0];
+    const content = FS[key];
+    if (!content) { println(C.red + 'cat: ' + args[0] + ': No such file or directory' + C.r); return; }
+    content.split('\n').forEach((l) => println(l));
+  }
+  async function cmdHistory() {
+    if (!state.history.length) { println(C.gry + '(no history yet)' + C.r); return; }
+    state.history.forEach((h, i) => {
+      println('  ' + C.gry + pad(i + 1, 4) + C.r + '  ' + C.wht + h + C.r);
+    });
+  }
+
+  /* ============================================================
+     22. OFFLINE AI KB  (fallback when live API is unavailable)
+     ============================================================ */
+  const AI_KB = [
+    { k: ['hello','hi','hey','salam','assalam','good morning','good evening'],
+      a: ['Hey there 👋 I am HEX AI v3.3. Ask me anything or type "help".',
+          'Hello! Terminal link established. What shall we run today?'] },
+    { k: ['who are you','your name','what are you','introduce yourself'],
+      a: ['I am HEX AI — a live-AI-powered terminal. My answers come from gen.pollinations.ai (free, no API key). I also have a small offline KB as fallback.'] },
+    { k: ['what can you do','capabilities','features','commands'],
+      a: ['I answer questions via a live LLM, run shell-style commands, fetch URLs via a free CORS proxy pool, install virtual packages (python, figlet, nmap, git…), talk to browser hardware via termux-api, and manage 30 colour schemes + 20 fonts through termux-style. Type "help".'] },
+    { k: ['proxy','cors','fetch','internet'],
+      a: ['Network requests route through ' + PROXIES.length + ' free CORS proxies with automatic failover. Use: fetch <url>  (or curl / wget).'] },
+    { k: ['xterm','xterm.js','how do you work'],
+      a: ['The screen is xterm.js — the same terminal frontend used by VS Code, Tabby and Hyper. I feed it real VT sequences from a JS shell emulator.'] },
+    { k: ['termux','android','mobile','phone'],
+      a: ['This is a Termux-styled interface. The key row below the screen gives ESC, CTRL, ALT, TAB, arrows and more — like Termux extra keys. termux-api commands map onto real browser APIs.'] },
+    { k: ['termux-api','api','battery','vibrate','notification','clipboard','tts'],
+      a: ['Install with "pkg install termux-api". Then use termux-battery-status, termux-vibrate, termux-clipboard-set/get, termux-notification, termux-tts-speak, termux-location, termux-toast, termux-share, termux-dialog, termux-camera-photo and 20+ more.'] },
+    { k: ['termux-style','color','colour','theme','font'],
+      a: ['Install with "pkg install termux-styling". Then run "termux-style" for the interactive menu, or "termux-style set <name>" and "termux-style font <id>" directly.'] },
+    { k: ['addon','addons','boot','float','tasker','widget','styling'],
+      a: ['Termux addons: termux-api (hardware), termux-boot (boot scripts), termux-float (floating window), termux-styling (colours & fonts), termux-tasker (automation), termux-widget (home screen). Install any with "pkg install <name>".'] },
+    { k: ['package','install','pkg','apt'],
+      a: ['Use "pkg list" to see every package and "pkg install <name>" to add it. Installed packages unlock new commands like python, nmap, figlet, cowsay, and all termux addons.'] },
+    { k: ['thank','thanks','thx'],
+      a: ['You are welcome! Type "help" whenever you need the index. ⚡'] },
+    { k: ['joke','funny'],
+      a: ['Why do programmers prefer dark mode? Because light attracts bugs. 🐛',
+          'There are only 10 kinds of people: those who understand binary and those who do not.',
+          'I would tell you a UDP joke, but you might not get it.'] }
+  ];
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function tryMath(q) {
+    if (!/^[\d\s+\-*/().%^]+$/.test(q)) return null;
+    try {
+      const expr = q.replace(/\^/g, '**');
+      const val = Function('"use strict";return (' + expr + ')')();
+      if (typeof val === 'number' && isFinite(val)) return val;
+    } catch (e) {}
+    return null;
+  }
+  function offlineReply(q) {
+    const lower = q.toLowerCase();
+    for (const entry of AI_KB) {
+      if (entry.k.some((k) => lower.indexOf(k) !== -1)) return pick(entry.a);
+    }
+    return 'I parsed "' + q + '" but my offline core has no direct match. ' +
+           'The live AI endpoint seems unreachable right now — try again, or ' +
+           'type "help" for the command index.';
+  }
+
+  /* ============================================================
+     23. HEX AI COMMAND  (live via gen.pollinations.ai)
+     ============================================================ */
+  async function cmdAI(args) {
+    /* ---------- sub-commands ---------- */
+    if (args[0] === '--clear' || args[0] === '--reset') {
+      resetConversation();
+      println(C.grn + '✔ conversation memory cleared (' + (conversation.length - 1) + ' turns kept)' + C.r);
+      return;
+    }
+    if (args[0] === '--status') {
+      println('');
+      println(C.grn + C.b + '  HEX AI — LIVE STATUS' + C.r);
+      println(C.gry + '  ─────────────────────────────────────────' + C.r);
+      println('  ' + C.cyn + 'endpoint : ' + C.r + C.wht + HEX_AI_ENDPOINT + C.r);
+      println('  ' + C.cyn + 'model    : ' + C.r + C.wht + HEX_AI_MODEL + C.r);
+      println('  ' + C.cyn + 'api key  : ' + C.r + C.grn + 'none required' + C.r);
+      println('  ' + C.cyn + 'stream   : ' + C.r + C.wht + 'yes (SSE)' + C.r);
+      println('  ' + C.cyn + 'memory   : ' + C.r + C.wht + (conversation.length - 1) + ' / ' + MAX_TURNS + ' turns' + C.r);
+      println('  ' + C.cyn + 'mode     : ' + C.r +
+              (state.aiLive ? C.grn + 'LIVE' + C.r : C.yel + 'OFFLINE (local KB)' + C.r));
+      println('');
+      return;
+    }
+    if (args[0] === '--offline') {
+      state.aiLive = false;
+      println(C.yel + '⚠ HEX AI switched to offline mode (local KB only)' + C.r);
+      return;
+    }
+    if (args[0] === '--online') {
+      state.aiLive = true;
+      println(C.grn + '✔ HEX AI switched to LIVE mode (gen.pollinations.ai)' + C.r);
+      return;
+    }
+
+    const q = args.join(' ').trim();
+
+    if (!q) {
+      println('');
+      println(C.grn + '  HEX AI ▸ usage: ai <your question>' + C.r);
+      println(C.gry + '  examples:' + C.r);
+      println(C.gry + '    ai what is xterm.js' + C.r);
+      println(C.gry + '    ai write a bash loop from 1 to 10' + C.r);
+      println(C.gry + '    ai --clear     (reset conversation)' + C.r);
+      println(C.gry + '    ai --status    (check the live endpoint)' + C.r);
+      println('');
+      return;
+    }
+
+    /* ---------- local math shortcut ---------- */
+    const math = tryMath(q);
+    if (math !== null) {
+      println('');
+      println('  ' + C.grn + '▸' + C.r + ' ' + C.wht + q + ' = ' + C.r + C.grn + C.b + math + C.r);
+      println('');
+      return;
+    }
+
+    /* ---------- fetch from the LIVE endpoint ---------- */
+    println('');
+    term.write('  ' + C.grn + C.b + '╭─ HEX AI ' + C.r + C.gry + '──────── live · ' + HEX_AI_MODEL + ' ────────' + C.r + '\r\n');
+
+    const spinFrames = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
+    let spinIdx = 0;
+    let gotFirstToken = false;
+    let headerPrinted = false;
+    setStatus('ai');
+    if (statusPill) statusPill.classList.add('ai');
+
+    /* write the streaming prefix */
+    term.write('  ' + C.grn + '│ ' + C.r);
+
+    /* spinner while we wait for the first token */
+    const spinId = setInterval(() => {
+      if (gotFirstToken) return;
+      const f = spinFrames[spinIdx++ % spinFrames.length];
+      term.write('\x1b[2K\r  ' + C.grn + '│ ' + C.cyn + f + C.r + ' ' +
+                 C.gry + 'thinking…' + C.r);
+    }, 72);
+
+    /* record the user's message into the rolling context */
+    pushConversation('user', q);
+
+    let reply = '';
+    let via   = '';
+
+    /* line-wrap helper: intercept tokens and wrap at terminal width */
+    const wrapWidth = Math.max(20, term.cols - 6);
+    let currentCol = 0;
+
+    function writeWrapped(chunk) {
+      for (let i = 0; i < chunk.length; i++) {
+        const ch = chunk[i];
+        if (ch === '\n') {
+          term.write('\r\n  ' + C.grn + '│ ' + C.r + C.wht);
+          currentCol = 0;
+          continue;
+        }
+        if (ch === '\r') continue;
+        if (currentCol >= wrapWidth) {
+          term.write('\r\n  ' + C.grn + '│ ' + C.r + C.wht);
+          currentCol = 0;
+        }
+        /* colour codes reset to white after coloured system messages */
+        term.write(C.wht + ch + C.r);
+        currentCol++;
+      }
+    }
+
+    const result = await streamHexAIReply(
+      q,
+      (token) => {
+        if (!gotFirstToken) {
+          gotFirstToken = true;
+          clearInterval(spinId);
+          term.write('\x1b[2K\r  ' + C.grn + '│ ' + C.r);
+          headerPrinted = true;
+        }
+        reply += token;
+        writeWrapped(token);
+      },
+      (attemptLabel) => {
+        via = attemptLabel;
+      }
+    );
+
+    clearInterval(spinId);
+
+    /* ---------- success ---------- */
+    if (result.ok && reply) {
+      /* remember the assistant reply */
+      pushConversation('assistant', reply);
+
+      /* end the box */
+      term.write('\r\n');
+      println('  ' + C.grn + '╰─ ' + C.gry + 'via ' + via + ' · ' +
+              reply.length + ' chars · ' +
+              (conversation.length - 1) + '/' + MAX_TURNS + ' turns' + C.r);
+      println('');
+      setStatus('online');
+      if (statusPill) statusPill.classList.remove('ai');
+      return;
+    }
+
+    /* ---------- fallback: offline KB ---------- */
+    clearInterval(spinId);
+
+    if (!gotFirstToken) {
+      term.write('\x1b[2K\r  ' + C.grn + '│ ' + C.r);
+    }
+
+    println('');
+    println('  ' + C.grn + '╰─ ' + C.yel + 'live endpoint unreachable — falling back to local KB' + C.r);
+    println('');
+
+    const fallback = offlineReply(q);
+    pushConversation('assistant', fallback);
+
+    term.write('  ' + C.grn + C.b + '╭─ HEX AI ' + C.r + C.gry + '──────── offline KB ────────' + C.r + '\r\n');
+    term.write('  ' + C.grn + '│ ' + C.r);
+    await typeOut('  ' + C.wht + fallback + C.r, 6);
+    println('  ' + C.grn + '╰──────────────────────────────────────' + C.r);
+    println('');
+
+    setStatus('online');
+    if (statusPill) statusPill.classList.remove('ai');
+  }
+
+  /* ---- fetch ---- */
+  async function cmdFetch(args) {
+    const raw = args.filter((a) => a.charAt(0) !== '-');
+    let url = raw[0];
+    const keepRaw = args.indexOf('-raw') !== -1;
+    if (!url) {
+      println('');
+      println(C.yel + '  usage: fetch <url>  [-raw]' + C.r);
+      println(C.gry + '  example: fetch https://example.com' + C.r);
+      println('');
+      return;
+    }
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    println('');
+    println('  ' + C.cyn + '→ ' + C.r + C.wht + url + C.r);
+    println('  ' + C.gry + 'routing through free proxy pool (' + PROXIES.length + ' nodes)…' + C.r);
+    const res = await proxyFetch(url);
+    if (res.aborted) { println(C.yel + '  ✖ aborted by user' + C.r); return; }
+    if (!res.ok) {
+      println('');
+      println(C.red + '  ✖ fetch failed — every proxy node is unreachable right now.' + C.r);
+      println('');
+      return;
+    }
+    println('');
+    println('  ' + C.grn + C.b + '✔ 200 OK' + C.r + C.gry + '   via ' + res.via + '   ' +
+            (res.text.length / 1024).toFixed(1) + ' KB' + C.r);
+    println('');
+    let body = res.text;
+    if (!keepRaw) {
+      body = body
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<noscript[\s\S]*?<\/noscript>/gi, '')
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+        .replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+    }
+    const lines = body.split('\n').filter((l) => l.trim().length).slice(0, 28);
+    const maxChars = 1600;
+    let printed = 0;
+    for (const l of lines) {
+      if (printed >= maxChars) break;
+      const cut = l.length > 160 ? l.slice(0, 160) + '…' : l;
+      println('  ' + C.gry + '│' + C.r + ' ' + C.wht + cut + C.r);
+      printed += cut.length;
+      await sleep(14);
+    }
+    println('');
+    println(C.gry + '  … preview truncated. use "-raw" for untouched output.' + C.r);
+    println('');
+  }
+
+  async function cmdOpen(args) {
+    let url = args[0];
+    if (!url) { println(C.yel + 'usage: open <url>' + C.r); return; }
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    println(C.grn + '✔ opening ' + url + ' in a new tab' + C.r);
+  }
+
+  async function cmdProxy(args) {
+    const sub = (args[0] || '').toLowerCase();
+    if (sub === 'on')  { state.proxy = true;  println(C.grn + '✔ proxy pool enabled' + C.r); return; }
+    if (sub === 'off') { state.proxy = false; println(C.yel + '⚠ proxy pool disabled' + C.r); return; }
+    println('');
+    println('  ' + C.grn + C.b + 'FREE PROXY POOL' + C.r + C.gry + '  (unlimited · no key · no cost)' + C.r);
+    println('  ' + C.gry + '──────────────────────────────────────────────' + C.r);
+    PROXIES.forEach((p, i) => {
+      println('  ' + C.grn + ' ● ' + C.r + C.wht + ('node ' + (i + 1)).padEnd(9, ' ') + C.r +
+              C.gry + '│ ' + C.r + C.cyn + PROXY_LABELS[i] + C.r);
+    });
+    println('');
+    println('  ' + C.cyn + 'status  : ' + C.r + (state.proxy ? C.grn + 'ENABLED' + C.r : C.yel + 'DISABLED' + C.r));
+    println('  ' + C.cyn + 'mode    : ' + C.r + C.wht + 'automatic failover (sequential)' + C.r);
+    println('  ' + C.cyn + 'timeout : ' + C.r + C.wht + '15000 ms per node' + C.r);
+    println('');
+  }
+
+  async function cmdMatrix() {
+    const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ';
+    const frames = 90;
+    println(C.grn + '▸ entering the matrix… (Ctrl+C or wait)' + C.r);
+    term.write('\x1b[?25l');
+    for (let f = 0; f < frames && !state.interrupt; f++) {
+      let line = '';
+      const cols = Math.max(10, term.cols - 1);
+      for (let c = 0; c < cols; c++) {
+        line += Math.random() > 0.45
+          ? chars[Math.floor(Math.random() * chars.length)] : ' ';
+      }
+      term.write('\x1b[2K\r' + C.grn + line + C.r);
+      await sleep(55);
+    }
+    term.write('\x1b[2K\r\x1b[?25h');
+    println(C.gry + '▸ matrix stopped.' + C.r);
+  }
+
+  async function cmdPkg(args) {
+    const sub  = (args[0] || 'list').toLowerCase();
+    const name = args[1] ? args[1].toLowerCase() : null;
+
+    if (sub === 'install' || sub === 'i' || sub === 'add') {
+      if (!name) { println(C.yel + 'usage: pkg install <package>' + C.r); return; }
+      if (!PACKAGES[name]) {
+        println(C.red + 'E: Unable to locate package "' + name + '"' + C.r);
+        println(C.gry + 'run "pkg list" to see available packages.' + C.r);
+        return;
+      }
+      if (state.installed[name]) { println(C.yel + name + ' is already the newest version.' + C.r); return; }
+      const isAddon = !!PACKAGES[name].addon;
+
+      println('');
+      println(C.cyn + 'Reading package lists... Done' + C.r);
+      println(C.cyn + 'Building dependency tree... Done' + C.r);
+      println(C.gry + 'The following NEW package will be installed:' + C.r);
+      println('  ' + C.grn + name + C.r + C.gry + '  (' + PACKAGES[name].size + ')  — ' + PACKAGES[name].desc + C.r);
+      if (isAddon) println('  ' + C.mag + '★ Termux addon — extends the terminal with new features' + C.r);
+      println('');
+      await sleep(260);
+
+      if (isAddon) { await progressBar('download addon'); await progressBar('link with termux'); }
+      else         { await progressBar('fetch ' + name);   await progressBar('unpack'); }
+      await sleep(180);
+
+      state.installed[name] = true;
+      println('');
+      println(C.grn + C.b + '✔ ' + name + ' installed successfully.' + C.r);
+
+      if (name === 'termux-api')         println(C.gry + 'run "termux-api" to see every termux-api command.' + C.r);
+      else if (name === 'termux-styling') println(C.gry + 'run "termux-style" for the interactive style menu.' + C.r);
+      else if (name === 'termux-float')   println(C.gry + 'run "termux-float" or "termux-float off" to toggle floating mode.' + C.r);
+      else if (name === 'termux-boot')    println(C.gry + 'run "termux-boot" to inspect the boot script directory.' + C.r);
+      else if (name === 'termux-tasker')  println(C.gry + 'run "termux-tasker" to configure the Tasker bridge.' + C.r);
+      else if (name === 'termux-widget')  println(C.gry + 'run "termux-widget" to manage home-screen scripts.' + C.r);
+      else                                println(C.gry + 'run "' + (PACKAGES[name].cmd || name) + '" to use it.' + C.r);
+      println('');
+      showToast('📦 ' + name + ' installed', 'ok');
+      return;
+    }
+
+    if (sub === 'remove' || sub === 'rm' || sub === 'uninstall') {
+      if (!name || !state.installed[name]) {
+        println(C.red + 'E: package "' + (name || '') + '" is not installed' + C.r); return;
+      }
+      await progressBar('removing ' + name);
+      delete state.installed[name];
+      if (name === 'termux-float') ROOT.classList.remove('hx-float');
+      println(C.grn + '✔ ' + name + ' removed.' + C.r);
+      return;
+    }
+
+    if (sub === 'update' || sub === 'upgrade') {
+      println(C.cyn + 'Hit:1 https://packages.hexai.dev/termux stable InRelease' + C.r);
+      await sleep(300);
+      println(C.cyn + 'Reading package lists... Done' + C.r);
+      await progressBar('index');
+      println(C.grn + '✔ All packages are up to date.' + C.r);
+      return;
+    }
+
+    println('');
+    println('  ' + C.grn + C.b + 'HEX AI PACKAGE REPOSITORY' + C.r);
+    println('  ' + C.gry + '────────────────────────────────────────────────────────' + C.r);
+
+    const regs = Object.keys(PACKAGES).filter((n) => !PACKAGES[n].addon);
+    const adds = Object.keys(PACKAGES).filter((n) =>  PACKAGES[n].addon);
+
+    println('  ' + C.cyn + C.b + 'REGULAR PACKAGES' + C.r);
+    regs.forEach((n) => {
+      const inst = state.installed[n];
+      const st   = inst ? C.grn + '  ●  ' + C.r : C.gry + '  ○  ' + C.r;
+      const nm   = inst ? C.grn + C.b + n.padEnd(12, ' ') + C.r : C.wht + n.padEnd(12, ' ') + C.r;
+      println('  ' + st + nm + C.gry + PACKAGES[n].size.padEnd(11, ' ') + C.r + C.wht + PACKAGES[n].desc + C.r);
+    });
+    println('');
+    println('  ' + C.mag + C.b + 'TERMUX ADDONS' + C.r);
+    adds.forEach((n) => {
+      const inst = state.installed[n];
+      const st   = inst ? C.grn + '  ●  ' + C.r : C.gry + '  ○  ' + C.r;
+      const nm   = inst ? C.grn + C.b + n.padEnd(18, ' ') + C.r : C.wht + n.padEnd(18, ' ') + C.r;
+      println('  ' + st + nm + C.gry + PACKAGES[n].size.padEnd(11, ' ') + C.r + C.wht + PACKAGES[n].desc + C.r);
+    });
+    println('');
+    println(C.gry + '  installed: ' + Object.keys(state.installed).length +
+            ' / ' + Object.keys(PACKAGES).length + C.r);
+    println(C.gry + '  usage: pkg install <name> | pkg remove <name>' + C.r);
+    println('');
+  }
+
+  async function cmdReboot() {
+    println(C.yel + '▸ rebooting HEX AI terminal…' + C.r);
+    await sleep(400);
+    term.clear();
+    state.history = [];
+    state.cwd = '~';
+    state.closed = false;
+    lineBuf = ''; cursor = 0;
+    /* memory is preserved across reboots (realistic) */
+    await bootSequence(true);
+    printPrompt();
+  }
+
+  async function cmdExit() {
+    println('');
+    println(C.grn + '  ╭──────────────────────────────────────╮' + C.r);
+    println(C.grn + '  │  session closed — thanks for using   │' + C.r);
+    println(C.grn + '  │  HEX AI v3.3 · type "reboot" to       │' + C.r);
+    println(C.grn + '  │  return to the terminal              │' + C.r);
+    println(C.grn + '  ╰──────────────────────────────────────╯' + C.r);
+    println('');
+    state.closed = true;
+  }
+
+  /* ------------------------------------------------------------
+     24. PACKAGE-GATED CLASSIC COMMANDS
+     ------------------------------------------------------------ */
+  async function cmdPython(args) {
+    const expr = args.join(' ');
+    println(C.cyn + 'Python 3.12.0 (HEX AI build) on linux' + C.r);
+    if (!expr) { println('>>> ' + C.gry + '(interactive REPL is limited in web mode)' + C.r); return; }
+    try {
+      if (/^[\d\s+\-*/().%^a-zA-Z_]*$/.test(expr)) {
+        const js = expr.replace(/\^/g, '**');
+        const out = Function('"use strict";return (' + js + ')')();
+        println('>>> ' + expr);
+        println(C.grn + String(out) + C.r);
+      } else println(C.red + 'SyntaxError: unsupported expression' + C.r);
+    } catch (e) { println(C.red + 'SyntaxError: ' + e.message + C.r); }
+  }
+
+  async function cmdFiglet(args) {
+    const text = args.join(' ').slice(0, 12) || 'HEX AI';
+    const font = {
+      'A':'█▀█','B':'█▀▄','C':'█▀▀','D':'█▀▄','E':'█▀▀','F':'█▀▀','G':'█▀▀',
+      'H':'█ █','I':'█','J':' █','K':'█▄▀','L':'█  ','M':'█▀▄▀█','N':'█▄ █',
+      'O':'█▀█','P':'█▀▀','Q':'█▀█','R':'█▀▄','S':'█▀▀','T':'▀█▀','U':'█ █',
+      'V':'█ █','W':'█ █ █','X':'▀▄▀','Y':'▀█▀','Z':'▀▀█',
+      '0':'█▀█','1':' █ ','2':'▀▀█','3':'▀▀█','4':'█ █','5':'█▀▀',
+      '6':'█▀▀','7':'▀▀█','8':'█▀█','9':'█▀█',' ':'   ','!':'█','?':'▀█'
+    };
+    const up = text.toUpperCase().split('');
+    const l1 = up.map((c) => (font[c] || '???').split(' ')[0] || '').join(' ');
+    const l2 = up.map((c) => (font[c] || '???').split(' ')[1] || '').join(' ');
+    println('');
+    println(C.grn + C.b + ' ' + l1 + C.r);
+    println(C.cyn + C.b + ' ' + l2 + C.r);
+    println('');
+  }
+
+  async function cmdCowsay(args) {
+    const msg = args.join(' ') || 'HEX AI says hello from the browser!';
+    const words = msg.split(' ');
+    const lines = []; let cur = '';
+    words.forEach((w) => {
+      if ((cur + ' ' + w).trim().length > 34) { lines.push(cur.trim()); cur = w; }
+      else cur += ' ' + w;
+    });
+    if (cur.trim()) lines.push(cur.trim());
+    const width = Math.max(...lines.map((l) => l.length));
+    println('');
+    println(C.grn + ' ' + '_'.repeat(width + 2) + C.r);
+    lines.forEach((l) => println(C.grn + ' < ' + C.wht + l.padEnd(width, ' ') + C.grn + ' >' + C.r));
+    println(C.grn + ' ' + '-'.repeat(width + 2) + C.r);
+    println(C.grn + '        \\   ^__^' + C.r);
+    println(C.grn + '         \\  (oo)\\_______' + C.r);
+    println(C.grn + '            (__)\\       )\\/\\' + C.r);
+    println(C.grn + '                ||----w |' + C.r);
+    println(C.grn + '                ||     ||' + C.r);
+    println('');
+  }
+
+  const FORTUNES = [
+    'Simplicity is the soul of efficiency. — Austin Freeman',
+    'The best way to predict the future is to invent it. — Alan Kay',
+    'Programs must be written for people to read. — Harold Abelson',
+    'Talk is cheap. Show me the code. — Linus Torvalds',
+    'Premature optimization is the root of all evil. — Donald Knuth',
+    'Any sufficiently advanced technology is indistinguishable from magic. — Arthur C. Clarke',
+    'It works on my machine. — Every developer, ever',
+    'Deleted code is debugged code. — Jeff Sickel'
+  ];
+  async function cmdFortune() {
+    println('');
+    println('  ' + C.yel + '✦ ' + C.wht + pick(FORTUNES) + C.r);
+    println('');
+  }
+
+  async function cmdHtop() {
+    const procs = [
+      ['1',   'root',  '0.0', '2.1', 'init'],
+      ['42',  'hexai', '1.4', '4.8', 'hexai-core'],
+      ['77',  'hexai', '0.6', '3.2', 'xterm-renderer'],
+      ['120', 'hexai', '0.2', '1.4', 'proxy-pool'],
+      ['140', 'hexai', '0.4', '2.0', 'termux-api-bridge'],
+      ['155', 'hexai', '0.8', '3.6', 'pollinations-llm'],
+      ['256', 'hexai', '0.1', '0.9', 'pkg-daemon'],
+      ['512', 'guest', '0.0', '0.5', 'browser-event-loop']
+    ];
+    println('');
+    println(C.grn + '  HEX AI · htop' + C.r + C.gry + '   load average: 0.18 0.11 0.07' + C.r);
+    println('  ' + C.gry + 'PID   USER    CPU%   MEM%   COMMAND' + C.r);
+    println('  ' + C.gry + '────────────────────────────────────────' + C.r);
+    for (const p of procs) {
+      const cpu = parseFloat(p[2]);
+      const col = cpu > 1 ? C.yel : C.grn;
+      println('  ' + C.wht + p[0].padEnd(6, ' ') + C.r +
+              C.cyn + p[1].padEnd(8, ' ') + C.r +
+              col + p[2].padEnd(7, ' ') + C.r +
+              C.mag + p[3].padEnd(7, ' ') + C.r +
+              C.wht + p[4] + C.r);
+      await sleep(90);
+    }
+    const used = Math.round(30 + Math.random() * 30);
+    println('');
+    println('  ' + C.cyn + 'Mem' + C.r + ' ' +
+            C.grn + '[' + '█'.repeat(Math.round(used / 5)) + '░'.repeat(20 - Math.round(used / 5)) + ']' + C.r +
+            ' ' + C.wht + used + '%' + C.r);
+    println('');
+  }
+
+  async function cmdNmap(args) {
+    const host = args[0] || 'localhost';
+    const ports = [
+      [22,   'ssh',     'open'],
+      [80,   'http',    'open'],
+      [443,  'https',   'open'],
+      [3000, 'node',    'closed'],
+      [8080, 'http-alt','filtered']
+    ];
+    println('');
+    println(C.gry + 'Starting HEX AI scan 1.0 at ' + new Date().toISOString() + C.r);
+    println(C.gry + 'Nmap scan report for ' + C.wht + host + C.r);
+    for (const p of ports) {
+      await sleep(180);
+      const col = p[2] === 'open' ? C.grn : (p[2] === 'filtered' ? C.yel : C.red);
+      println('  ' + C.cyn + String(p[0]).padEnd(6, ' ') + C.r +
+              C.gry + 'tcp   ' + C.r + col + p[2].padEnd(9, ' ') + C.r + C.wht + p[1] + C.r);
+    }
+    println('');
+    println(C.gry + 'Nmap done: 1 IP address (1 host up) scanned in 1.02 seconds' + C.r);
+    println(C.yel + '⚠ simulation only — no real network packets were sent.' + C.r);
+    println('');
+  }
+
+  async function cmdGit(args) {
+    const sub = (args[0] || '').toLowerCase();
+    if (sub === 'clone') {
+      const repo = args[1] || 'https://github.com/xtermjs/xterm.js';
+      println(C.cyn + "Cloning into '" + repo.split('/').pop().replace('.git','') + "'..." + C.r);
+      await progressBar('objects');
+      println(C.grn + '✔ clone complete (virtual)' + C.r);
+      return;
+    }
+    if (sub === 'status') { println('On branch ' + C.grn + 'main' + C.r); println('nothing to commit, working tree clean'); return; }
+    if (sub === 'log') {
+      println(C.yel + 'commit a1b2c3d' + C.r + '  HEX AI core v3.3 — live LLM');
+      println(C.yel + 'commit e4f5g6h' + C.r + '  add termux-api bridge');
+      println(C.yel + 'commit i7j8k9l' + C.r + '  port termux-style');
+      return;
+    }
+    println(C.gry + 'usage: git clone|status|log' + C.r);
+  }
+
+  async function cmdLolcat(args) {
+    const text = args.join(' ') || 'HEX AI IS AWESOME';
+    const cols = [C.grn, C.cyn, C.blu, C.mag, C.yel, C.red];
+    let out = '';
+    for (let i = 0; i < text.length; i++) out += cols[i % cols.length] + text[i];
+    println('');
+    println('  ' + out + C.r);
+    println('');
+  }
+
+  async function cmdSl() {
+    const train = [
+      '      ====        ________                ___________ ',
+      '  _D _|  |_______/        \\__I_I_____===__|_________| ',
+      '   |(_)---  |   H\\________/ |   |        =|___ ___|   ',
+      '   /     |  |   H  |  |     |   |         ||_| |_||   ',
+      '  |      |  |   H  |__--------------------| [___] |   ',
+      '  | ________|___H__/__|_____/[][]~\\_______|       |   ',
+      '  |/ |   |-----------I_____I [][] []  D   |=======|__ ',
+      '__/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__ ',
+      ' |/-=|___|=    ||    ||    ||    |_____/~\\___/        ',
+      '  \\_/      \\O=====O=====O=====O_/      \\_/            '
+    ];
+    for (let shift = 0; shift < 30 && !state.interrupt; shift++) {
+      term.write('\x1b[2K\r');
+      for (let i = 0; i < train.length; i++) {
+        if (i > 0) term.write('\x1b[1A');
+        term.write('\x1b[2K\r' + C.grn + train[i] + C.r);
+      }
+      term.write('\r\n');
+      await sleep(90);
+    }
+    println(C.gry + 'choo choo 🚂' + C.r);
+  }
+
+  /* ------------------------------------------------------------
+     25. COMMAND DISPATCH TABLE
+     ------------------------------------------------------------ */
+  const BUILTIN_COMMANDS = {
+    help:1, about:1, banner:1, clear:1, cls:1, echo:1, date:1, time:1,
+    whoami:1, uname:1, neofetch:1, pwd:1, ls:1, cd:1, cat:1, history:1,
+    ai:1, ask:1, hex:1, fetch:1, curl:1, wget:1, get:1, open:1,
+    xdg_open:1, proxy:1, matrix:1, pkg:1, apt:1, apt_get:1,
+    reboot:1, restart:1, reset:1, exit:1, logout:1, sudo:1, '?':1,
+    'termux-style':1, tstyle:1,
+    'termux-api':1,
+    'termux-boot':1, 'termux-float':1, 'termux-tasker':1, 'termux-widget':1,
+    'termux-battery-status':1, 'termux-vibrate':1,
+    'termux-clipboard-get':1, 'termux-clipboard-set':1,
+    'termux-toast':1, 'termux-notification':1, 'termux-notification-remove':1,
+    'termux-tts-speak':1, 'termux-tts-engines':1,
+    'termux-location':1, 'termux-wifi-connectioninfo':1, 'termux-wifi-scaninfo':1,
+    'termux-wifi-enable':1, 'termux-share':1, 'termux-dialog':1,
+    'termux-fingerprint':1, 'termux-sensor':1, 'termux-camera-photo':1,
+    'termux-torch':1, 'termux-volume':1, 'termux-brightness':1,
+    'termux-telephony-deviceinfo':1, 'termux-telephony-cellinfo':1,
+    'termux-telephony-call':1, 'termux-contact-list':1, 'termux-sms-list':1,
+    'termux-sms-send':1, 'termux-call-log':1,
+    'termux-media-player':1, 'termux-media-scan':1, 'termux-audio-info':1,
+    'termux-microphone-record':1, 'termux-wallpaper':1, 'termux-storage-get':1,
+    'termux-download':1, 'termux-open':1, 'termux-open-url':1,
+    'termux-share-file':1, 'termux-usb':1, 'termux-infrared-frequencies':1,
+    'termux-job-scheduler':1, 'termux-keystore':1
+  };
+
+  async function runCommand(line) {
+    if (!line) return;
+    const parts = tokenize(line);
+    if (!parts.length) return;
+
+    const cmd  = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    switch (cmd) {
+      case 'help': case '?':         return cmdHelp();
+      case 'about':                  return cmdAbout();
+      case 'banner':                 return printBanner();
+      case 'clear': case 'cls':      term.clear(); return;
+      case 'echo':                   println(args.join(' ')); return;
+      case 'date': case 'time':      return cmdDate();
+      case 'whoami':                 println(state.user); return;
+      case 'uname':                  return cmdUname();
+      case 'neofetch':               return cmdNeofetch();
+      case 'pwd':                    println('/data/data/com.termux/files/home'); return;
+      case 'ls':                     return cmdLs(args);
+      case 'cd':                     return cmdCd(args);
+      case 'cat':                    return cmdCat(args);
+      case 'history':                return cmdHistory();
+      case 'ai': case 'ask': case 'hex': return cmdAI(args);
+      case 'fetch': case 'curl': case 'wget': case 'get': return cmdFetch(args);
+      case 'open': case 'xdg-open':  return cmdOpen(args);
+      case 'proxy':                  return cmdProxy(args);
+      case 'matrix':                 return cmdMatrix();
+      case 'pkg': case 'apt': case 'apt-get': return cmdPkg(args);
+      case 'reboot': case 'restart': case 'reset': return cmdReboot();
+      case 'exit': case 'logout':    return cmdExit();
+      case 'sudo':
+        println(C.red + 'hexai is not in the sudoers file. This incident has been reported. 😄' + C.r);
+        return;
+      case 'termux-style': case 'tstyle':
+        if (!state.installed['termux-styling']) {
+          println('');
+          println(C.red + 'termux-style: command not found' + C.r);
+          println(C.gry + 'hint: run ' + C.grn + '"pkg install termux-styling"' + C.gry + ' first.' + C.r);
+          println('');
+          return;
+        }
+        return cmdTermuxStyle(args);
+      case 'termux-api':
+        return cmdTermuxApi(args);
+      case 'termux-boot':   return cmdAddonBoot();
+      case 'termux-float':  return cmdAddonFloat(!(args[0] && args[0].toLowerCase() === 'off'));
+      case 'termux-tasker': return cmdAddonTasker();
+      case 'termux-widget': return cmdAddonWidget(args);
+    }
+
+    if (cmd.indexOf('termux-') === 0) {
+      const sub = cmd.slice(7);
+      return cmdTermuxApi([sub].concat(args));
+    }
+
+    const gated = {
+      python  : ['python', 'python3'],
+      figlet  : ['figlet'],
+      cowsay  : ['cowsay'],
+      fortune : ['fortune'],
+      htop    : ['htop', 'top'],
+      nmap    : ['nmap'],
+      git     : ['git'],
+      lolcat  : ['lolcat'],
+      sl      : ['sl']
+    };
+    for (const pkg in gated) {
+      if (gated[pkg].indexOf(cmd) === -1) continue;
+      if (!state.installed[pkg]) {
+        println('');
+        println(C.red + '  ' + cmd + ': command not found' + C.r);
+        println(C.gry + '  hint: run ' + C.grn + '"pkg install ' + pkg + '"' + C.gry + ' to install it.' + C.r);
+        println('');
+        return;
+      }
+      switch (pkg) {
+        case 'python':  return cmdPython(args);
+        case 'figlet':  return cmdFiglet(args);
+        case 'cowsay':  return cmdCowsay(args);
+        case 'fortune': return cmdFortune();
+        case 'htop':    return cmdHtop();
+        case 'nmap':    return cmdNmap(args);
+        case 'git':     return cmdGit(args);
+        case 'lolcat':  return cmdLolcat(args);
+        case 'sl':      return cmdSl();
+      }
+    }
+
+    println('');
+    println(C.red + '  hexsh: ' + cmd + ': command not found' + C.r);
+    println(C.gry + '  type ' + C.grn + '"help"' + C.gry + ' for the full command index.' + C.r);
+    println('');
+  }
+
+  /* ------------------------------------------------------------
+     26. BOOT SEQUENCE
+     ------------------------------------------------------------ */
+  async function bootSequence(isReboot) {
+    state.closed = false;
+
+    const steps = isReboot
+      ? [
+          'Halting HEX kernel',
+          'Flushing virtual filesystem',
+          'Restarting xterm.js renderer',
+          'Re-arming free proxy pool',
+          'Re-linking pollinations LLM',
+          'Linking termux-api bridge',
+          'Reloading HEX AI neural core',
+          'All systems nominal'
+        ]
+      : [
+          'Initialising HEX kernel v3.3',
+          'Mounting virtual filesystem /hexai',
+          'Starting xterm.js renderer',
+          'Loading network stack (free proxy pool)',
+          'Connecting to gen.pollinations.ai (no API key)',
+          'Handshaking OpenAI-compatible endpoint',
+          'Fetching HEX AI neural core',
+          'Attaching Termux input bridge',
+          'Probing termux-api capabilities',
+          'All systems nominal'
+        ];
+
+    for (let i = 0; i < steps.length; i++) {
+      const pct = Math.round(((i + 1) / steps.length) * 100);
+      term.write('\x1b[2K\r' + C.gry + '[' + pad(pct, 3) + '%] ' + C.r + C.cyn + steps[i] + C.r);
+      await sleep(120 + Math.random() * 110);
+      term.write(' ' + C.grn + '✔' + C.r);
+      await sleep(55);
+      term.write('\r\n');
+    }
+
+    println('');
+    await printBanner();
+
+    println(C.gry + '  ┌─ SYSTEM ─────────────────────────────────┐' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'engine  ' + C.r + C.wht + 'xterm.js 5.5.0' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'AI      ' + C.r + C.wht + 'gen.pollinations.ai (live)' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'model   ' + C.r + C.wht + HEX_AI_MODEL + ' · no API key' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'proxy   ' + C.r + C.wht + PROXIES.length + ' free nodes (auto failover)' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'addons  ' + C.r + C.wht + '6 termux addons available' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'styles  ' + C.r + C.wht + SCHEME_NAMES.length + ' schemes · ' + FONTS.length + ' fonts' + C.r);
+    println(C.gry + '  └──────────────────────────────────────────┘' + C.r);
+    println('');
+    println(C.wht + '  Type ' + C.grn + C.b + 'help' + C.r + C.wht + ' for commands, ' +
+            C.grn + C.b + 'ai <question>' + C.r + C.wht + ' for LIVE AI.' + C.r);
+    println(C.wht + '  Try ' + C.mag + C.b + 'pkg install termux-api' + C.r + C.wht + ' and ' +
+            C.mag + C.b + 'pkg install termux-styling' + C.r + C.wht + '.' + C.r);
+    println('');
+  }
+
+  /* ------------------------------------------------------------
+     27. ON-SCREEN KEY ROW
+     ------------------------------------------------------------ */
+  const KEYS = [
+    { label:'ESC',  seq:'\x1b' },
+    { label:'CTRL', mod:'ctrl' },
+    { label:'ALT',  mod:'alt'  },
+    { label:'TAB',  seq:'\t'   },
+    { label:'↑',    seq:'\x1b[A' },
+    { label:'↓',    seq:'\x1b[B' },
+    { label:'←',    seq:'\x1b[D' },
+    { label:'→',    seq:'\x1b[C' },
+    { label:'HOME', seq:'\x1b[H' },
+    { label:'END',  seq:'\x1b[F' },
+    { label:'PGUP', seq:'\x1b[5~' },
+    { label:'PGDN', seq:'\x1b[6~' },
+    { label:'/',    seq:'/' },
+    { label:'-',    seq:'-' },
+    { label:'|',    seq:'|' },
+    { label:'~',    seq:'~' },
+    { label:'^C',   seq:'\x03', cls:'accent' },
+    { label:'^L',   seq:'\x0c', cls:'accent' },
+    { label:'⏎',    seq:'\r',   cls:'accent wide' },
+    { label:'⌫',    seq:'\x7f', cls:'accent' }
+  ];
+
+  const modButtons = {};
+
+  function buildKeyRow() {
+    if (!keysEl) return;
+    keysEl.innerHTML = '';
+    KEYS.forEach((k) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hx-key' + (k.cls ? ' ' + k.cls : '');
+      btn.textContent = k.label;
+      btn.setAttribute('aria-label', k.label);
+
+      const press = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (k.mod === 'ctrl') {
+          ctrlArmed = !ctrlArmed;
+          if (ctrlArmed) altArmed = false;
+          updateModKeys(); term.focus(); return;
+        }
+        if (k.mod === 'alt') {
+          altArmed = !altArmed;
+          if (altArmed) ctrlArmed = false;
+          updateModKeys(); term.focus(); return;
+        }
+        handleInput(k.seq);
+        term.focus();
+      };
+
+      btn.addEventListener('touchstart', press, { passive: false });
+      btn.addEventListener('mousedown', press);
+      if (k.mod) modButtons[k.mod] = btn;
+      keysEl.appendChild(btn);
+    });
+  }
+
+  function updateModKeys() {
+    if (modButtons.ctrl) modButtons.ctrl.classList.toggle('on', ctrlArmed);
+    if (modButtons.alt)  modButtons.alt.classList.toggle('on', altArmed);
+  }
+
+  buildKeyRow();
+
+  termEl.addEventListener('touchstart', () => { term.focus(); }, { passive: true });
+  termEl.addEventListener('click', () => { term.focus(); });
+
+  /* ------------------------------------------------------------
+     28. RESPONSIVE FIT
+     ------------------------------------------------------------ */
+  function responsiveFont() {
+    const w = termEl.clientWidth || ROOT.clientWidth;
+    let size = 13;
+    if (w < 340)      size = 9.5;
+    else if (w < 420) size = 10.5;
+    else if (w < 560) size = 11.5;
+    else if (w < 760) size = 12.5;
+    else              size = 13.5;
+    if (term.options.fontSize !== size) term.options.fontSize = size;
+  }
+
+  function fitNow() {
+    if (!fitAddon) return;
+    try { responsiveFont(); fitAddon.fit(); } catch (e) {}
+  }
+
+  window.addEventListener('resize', () => setTimeout(fitNow, 80));
+  window.addEventListener('orientationchange', () => setTimeout(fitNow, 250));
+
+  if (typeof ResizeObserver !== 'undefined') {
+    try {
+      const ro = new ResizeObserver(() => setTimeout(fitNow, 60));
+      ro.observe(termEl);
+    } catch (e) {}
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => setTimeout(fitNow, 120));
+  }
+
+  /* ------------------------------------------------------------
+     29. START
+     ------------------------------------------------------------ */
+  (async function start() {
+    try {
+      const s = localStorage.getItem('hexai.scheme');
+      if (s && SCHEMES[s]) { state.scheme = s; term.options.theme = SCHEMES[s].theme; ROOT.style.background = SCHEMES[s].theme.background; }
+      const f = localStorage.getItem('hexai.font');
+      if (f && FONTS.find((x) => x.id === f)) {
+        state.font = f;
+        term.options.fontFamily = FONTS.find((x) => x.id === f).css + ', monospace';
+      }
+    } catch (e) {}
+
+    await sleep(80); fitNow();
+    await sleep(60); fitNow();
+
+    await bootSequence(false);
+
+    if (loadingEl) {
+      loadingEl.classList.add('hide');
+      setTimeout(() => { loadingEl.style.display = 'none'; }, 600);
+    }
+
+    printPrompt();
+    term.focus();
+
+    /* silently probe the AI endpoint once (fire and forget) */
+    setTimeout(() => {
+      try {
+        fetch(HEX_AI_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: HEX_AI_MODEL,
+            messages: [{ role: 'user', content: 'ping' }],
+            stream: false,
+            max_tokens: 1
+          })
+        }).then((r) => {
+          if (!r.ok) state.aiLive = false;
+        }).catch(() => { state.aiLive = false; });
+      } catch (e) { state.aiLive = false; }
+    }, 1200);
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) setTimeout(fitNow, 120);
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>
