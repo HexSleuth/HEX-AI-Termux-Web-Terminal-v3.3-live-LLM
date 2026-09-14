@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
 <meta name="theme-color" content="#000000"/>
 <meta name="color-scheme" content="dark light"/>
-<title>HEX AI — Termux Web Terminal v3.4</title>
+<title>HEX AI — Termux Web Terminal v3.6</title>
 
 <!-- ============ xterm.js core stylesheet (CDN) ============ -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.css"/>
@@ -17,21 +17,20 @@
 
 <style>
 /* ============================================================
-   HEX AI TERMINAL v3.4
+   HEX AI TERMINAL v3.6
    Termux Android–authentic mobile interface
    Features:
      • Auto theme detection (follows device preference)
      • Forced dark / light mode toggle
      • Termux session drawer, menu bar, extra-keys row
      • Long-press context menu (Copy / Paste / Style / Help)
+     • Live AI via gen.pollinations.ai (OpenAI-compatible · API key)
+     • termux-style port — 89 color-schemes · 20 fonts
+     • termux-api bridge — 30+ Android hardware commands
    ============================================================ */
 
 /* ============================================================
    THEME TOKENS
-   Applied via [data-theme] on #hexai-widget:
-     auto  → follows prefers-color-scheme
-     dark  → forced dark (Termux default)
-     light → forced light
    ============================================================ */
 
 #hexai-widget{
@@ -221,7 +220,6 @@
 
 /* ============================================================
    TERMUX STATUS BAR (top)
-   Mirrors the real Termux app: session title + menu (⋮)
    ============================================================ */
 #hexai-widget .tm-statusbar{
   position:relative;
@@ -723,7 +721,7 @@
 <body>
 
 <!-- ============================================================
-     HEX AI WIDGET v3.4
+     HEX AI WIDGET v3.6
      ============================================================ -->
 <div id="hexai-widget" data-theme="auto">
 
@@ -750,6 +748,24 @@
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span>
         <span class="lbl">Reset terminal</span>
         <span class="kbd">reset</span>
+      </button>
+
+      <div class="tm-drawer-sep"></div>
+      <div class="tm-drawer-section">AI</div>
+
+      <button class="tm-drawer-item" data-action="ai-setkey">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 7a4 4 0 1 0-3.5 6H10v3H7v3H4v-3l6.5-6.5A4 4 0 0 1 15 7z"/><circle cx="16.5" cy="9.5" r=".8" fill="currentColor"/></svg></span>
+        <span class="lbl">Set AI API key</span>
+        <span class="kbd">ai --key</span>
+      </button>
+      <button class="tm-drawer-item" data-action="ai-models">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8"/></svg></span>
+        <span class="lbl">List AI models</span>
+        <span class="kbd">ai --models</span>
+      </button>
+      <button class="tm-drawer-item" data-action="ai-status">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="lbl">AI live status</span>
       </button>
 
       <div class="tm-drawer-sep"></div>
@@ -799,10 +815,6 @@
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg></span>
         <span class="lbl">About HEX AI</span>
       </button>
-      <button class="tm-drawer-item" data-action="ai-status">
-        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg></span>
-        <span class="lbl">AI live status</span>
-      </button>
     </nav>
   </aside>
 
@@ -814,7 +826,7 @@
 
     <div class="tm-session">
       <div class="tm-session-name">HEX AI · Termux</div>
-      <div class="tm-session-sub">termux@hexai <b>~</b> · v3.4 · <span id="tm-theme-label">auto</span></div>
+      <div class="tm-session-sub">termux@hexai <b>~</b> · v3.6 · <span id="tm-theme-label">auto</span></div>
     </div>
 
     <div class="tm-status-right">
@@ -832,6 +844,12 @@
     <button class="row" data-action="clear"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span>Clear screen<span class="kbd">^L</span></button>
     <button class="row" data-action="reset"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span>Reset terminal<span class="kbd">reset</span></button>
     <div class="sep"></div>
+    <div class="lbl-title">AI (gen.pollinations.ai)</div>
+    <button class="row" data-action="ai-setkey"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 7a4 4 0 1 0-3.5 6H10v3H7v3H4v-3l6.5-6.5A4 4 0 0 1 15 7z"/></svg></span>Set API key<span class="kbd">ai --key</span></button>
+    <button class="row" data-action="ai-models"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/></svg></span>List models<span class="kbd">ai --models</span></button>
+    <button class="row" data-action="ai-status"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span>AI status</button>
+    <button class="row" data-action="ai-clear"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M4 20L20 4"/></svg></span>Clear AI memory</button>
+    <div class="sep"></div>
     <div class="lbl-title">Style</div>
     <button class="row" data-action="theme-auto"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></span>Auto (device)<span class="kbd" id="mi-auto">✓</span></button>
     <button class="row" data-action="theme-dark"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span>Forced dark<span class="kbd" id="mi-dark"> </span></button>
@@ -841,15 +859,12 @@
     <button class="row" data-action="style-menu"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l9 4-9 4-9-4 9-4zM3 12l9 4 9-4"/></svg></span>termux-style menu</button>
     <button class="row" data-action="help"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.4 2.3c-.9.4-1.4 1-1.4 1.9v.3"/><circle cx="12" cy="17" r=".8" fill="currentColor"/></svg></span>Help</button>
     <button class="row" data-action="about"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg></span>About</button>
-    <div class="sep"></div>
-    <button class="row" data-action="ai-status"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span>AI status</button>
-    <button class="row" data-action="ai-clear"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M4 20L20 4"/></svg></span>Clear AI memory</button>
   </div>
 
   <!-- ---------- Loading veil ---------- -->
   <div class="hx-loading" id="hx-loading">
     <div class="hx-spin"></div>
-    <div class="hx-loadtxt">HEX AI v3.4 · Booting</div>
+    <div class="hx-loadtxt">HEX AI v3.6 · Booting</div>
   </div>
 
   <!-- ---------- Terminal screen ---------- -->
@@ -862,7 +877,7 @@
 
   <!-- ---------- Footer ---------- -->
   <div class="hx-foot">
-    powered by <span>𓋹•HexSleuth•𓃠</span> · termux-api · termux-style · Pollinations LLM · <span>HEX AI v3.4</span>
+    powered by <span>𓋹•HexSleuth•𓃠</span> · termux-api · termux-style (89 colors) · gen.pollinations.ai · <span>HEX AI v3.6</span>
   </div>
 
   <!-- ---------- Toasts ---------- -->
@@ -876,13 +891,23 @@
 
 <script>
 /* ================================================================
-   HEX AI — TERMUX WEB TERMINAL v3.4
+   HEX AI — TERMUX WEB TERMINAL v3.6
    Termux Android–authentic mobile interface
-     • Auto theme via prefers-color-scheme
-     • Forced dark / light toggle (3-state cycle)
-     • Session drawer + three-dot menu + long-press context menu
-     • Live AI via Pollinations.ai text API (no API key)
-     • termux-api bridge + termux-style port (30 schemes · 20 fonts)
+
+   NEW in v3.6:
+     • Faithful port of adi1090x/termux-style (install / uninstall)
+     • 89 color-schemes · 20 powerline-ready fonts
+     • L / I import (Local File · Internet URL) like the bash script
+     • .current_color / .current_font tracking
+     • reload_settings() "broadcast" simulation
+     • Exact bash-style banner + menu + about box
+     • Live AI via gen.pollinations.ai (OpenAI-compatible · API key)
+
+   Kept from v3.5:
+     • Auto theme detection · forced dark/light toggle
+     • Session drawer · three-dot menu · long-press context menu
+     • Streaming token-by-token AI replies
+     • termux-api bridge (30+ Android hardware commands)
    ================================================================ */
 (function () {
   'use strict';
@@ -928,7 +953,6 @@
 
   /* ------------------------------------------------------------
      2. THEME ENGINE
-     States: 'auto' | 'dark' | 'light'
      ------------------------------------------------------------ */
   const ThemeEngine = (function () {
     const STORAGE_KEY = 'hexai.theme';
@@ -938,9 +962,7 @@
       ? window.matchMedia('(prefers-color-scheme: dark)')
       : null);
 
-    function systemIsDark() {
-      return mql ? mql.matches : true;
-    }
+    function systemIsDark() { return mql ? mql.matches : true; }
 
     function effective() {
       if (current === 'dark')  return 'dark';
@@ -1006,7 +1028,7 @@
   })();
 
   /* ------------------------------------------------------------
-     3. TERMINAL SCHEMES (xterm.js color maps)
+     3. TERMINAL SCHEMES — 89 entries ported from adi1090x/termux-style
      ------------------------------------------------------------ */
   function mkScheme(displayName, bg, fg, cursor, p) {
     return {
@@ -1022,98 +1044,506 @@
     };
   }
 
-  const SCHEMES = {
-    'hex': mkScheme('HEX AI', '#04070c','#d7ffe9','#00ffa3',
-      ['#0b1016','#ff5c5c','#00ffa3','#ffd65c','#60a5ff','#ff5cdc','#00d9ff','#d7ffe9',
-       '#5c7385','#ff8a8a','#5cffc4','#ffe694','#96c2ff','#ff96e8','#6ce8ff','#ffffff']),
-    'termux': mkScheme('Termux Classic', '#000000','#ffffff','#ffffff',
-      ['#000000','#cc0000','#4e9a06','#c4a000','#3465a4','#75507b','#06989a','#d3d7cf',
-       '#555753','#ef2929','#8ae234','#fce94f','#729fcf','#ad7fa8','#34e2e2','#eeeeec']),
-    'dracula': mkScheme('Dracula', '#282a36','#f8f8f2','#f8f8f2',
-      ['#21222c','#ff5555','#50fa7b','#f1fa8c','#bd93f9','#ff79c6','#8be9fd','#f8f8f2',
-       '#6272a4','#ff6e6e','#69ff94','#ffffa5','#d6acff','#ff92df','#a4ffff','#ffffff']),
-    'gruvbox-dark': mkScheme('Gruvbox Dark', '#282828','#ebdbb2','#ebdbb2',
-      ['#282828','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#a89984',
-       '#928374','#fb4934','#b8bb26','#fabd2f','#83a598','#d3869b','#8ec07c','#ebdbb2']),
-    'gruvbox-light': mkScheme('Gruvbox Light', '#fbf1c7','#3c3836','#3c3836',
-      ['#fbf1c7','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#7c6f64',
-       '#928374','#9d0006','#79740e','#b57614','#076678','#8f3f71','#427b58','#3c3836']),
-    'nord': mkScheme('Nord', '#2e3440','#d8dee9','#d8dee9',
-      ['#3b4252','#bf616a','#a3be8c','#ebcb8b','#81a1c1','#b48ead','#88c0d0','#e5e9f0',
-       '#4c566a','#bf616a','#a3be8c','#ebcb8b','#81a1c1','#b48ead','#8fbcbb','#eceff4']),
-    'tokyonight': mkScheme('Tokyo Night', '#1a1b26','#c0caf5','#c0caf5',
-      ['#15161e','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#a9b1d6',
-       '#414868','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#c0caf5']),
-    'monokai': mkScheme('Monokai', '#272822','#f8f8f2','#f8f8f0',
-      ['#272822','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f8f8f2',
-       '#75715e','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f9f8f5']),
-    'solarized-dark': mkScheme('Solarized Dark', '#002b36','#839496','#839496',
-      ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
-       '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']),
-    'solarized-light': mkScheme('Solarized Light', '#fdf6e3','#657b83','#657b83',
-      ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
-       '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']),
-    'one-dark': mkScheme('One Dark', '#282c34','#abb2bf','#528bff',
-      ['#282c34','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#abb2bf',
-       '#5c6370','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#ffffff']),
-    'one-light': mkScheme('One Light', '#fafafa','#383a42','#526fff',
-      ['#383a42','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#a0a1a7',
-       '#696c77','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#202227']),
-    'catppuccin-mocha': mkScheme('Catppuccin Mocha', '#1e1e2e','#cdd6f4','#f5e0dc',
-      ['#45475a','#f38ba8','#a6e3a1','#f9e2af','#89b4fa','#f5c2e7','#94e2d5','#bac2de',
-       '#585b70','#f38ba8','#a6e3a1','#f9e2af','#89b4fa','#f5c2e7','#94e2d5','#a6adc8']),
-    'catppuccin-latte': mkScheme('Catppuccin Latte', '#eff1f5','#4c4f69','#dc8a78',
-      ['#5c5f77','#d20f39','#40a02b','#df8e1d','#1e66f5','#ea76cb','#179299','#acb0be',
-       '#6c6f85','#d20f39','#40a02b','#df8e1d','#1e66f5','#ea76cb','#179299','#bcc0cc']),
-    'rose-pine': mkScheme('Rosé Pine', '#191724','#e0def4','#524f67',
-      ['#26233a','#eb6f92','#31748f','#f6c177','#9ccfd8','#c4a7e7','#ebbcba','#e0def4',
-       '#6e6a86','#eb6f92','#31748f','#f6c177','#9ccfd8','#c4a7e7','#ebbcba','#e0def4']),
-    'rose-pine-dawn': mkScheme('Rosé Pine Dawn', '#faf4ed','#575279','#cecacd',
-      ['#f2e9e1','#b4637a','#286983','#ea9d34','#56949f','#907aa9','#d7827e','#575279',
-       '#9893a5','#b4637a','#286983','#ea9d34','#56949f','#907aa9','#d7827e','#575279']),
-    'everforest': mkScheme('Everforest', '#2d353b','#d3c6aa','#d3c6aa',
-      ['#475258','#e67e80','#a7c080','#dbbc7f','#7fbbb3','#d699b6','#83c092','#d3c6aa',
-       '#475258','#e67e80','#a7c080','#dbbc7f','#7fbbb3','#d699b6','#83c092','#d3c6aa']),
-    'kanagawa': mkScheme('Kanagawa', '#1f1f28','#dcd7ba','#c8c093',
-      ['#16161d','#c34043','#76946a','#c0a36e','#7e9cd8','#957fb8','#6a9589','#c8c093',
-       '#727169','#e82424','#98bb6c','#e6c384','#7fb4ca','#938aa9','#7aa89f','#dcd7ba']),
-    'night-owl': mkScheme('Night Owl', '#011627','#d6deeb','#80a4c2',
-      ['#011627','#ef5350','#22da6e','#addb67','#82aaff','#c792ea','#21c7a8','#ffffff',
-       '#575656','#ef5350','#22da6e','#ffeb95','#82aaff','#c792ea','#7fdbca','#ffffff']),
-    'palenight': mkScheme('Palenight', '#292d3e','#a6accd','#ffcc00',
-      ['#292d3e','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#d0d0d0',
-       '#676e95','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']),
-    'synthwave': mkScheme('Synthwave 84', '#262335','#ffffff','#f92aad',
-      ['#241b2f','#fe4450','#72f1b8','#fede5d','#36f9f6','#ff8b39','#ff7edb','#ffffff',
-       '#4c3f6b','#fe4450','#72f1b8','#fede5d','#36f9f6','#ff8b39','#ff7edb','#ffffff']),
-    'cyberpunk': mkScheme('Cyberpunk', '#0a0a12','#e0e0ff','#ff003c',
-      ['#0a0a12','#ff003c','#00ff9f','#fcee0a','#00b3ff','#ff00e5','#00fff0','#e0e0ff',
-       '#3a3a5a','#ff5c8a','#7dffc8','#fff770','#5cc8ff','#ff70f0','#70fff0','#ffffff']),
-    'matrix': mkScheme('Matrix', '#000700','#00ff41','#00ff41',
-      ['#001100','#00cc33','#00ff41','#7dff8a','#00aa22','#00dd55','#33ff66','#b6ffb6',
-       '#005500','#33ff66','#7dff8a','#b6ffb6','#33ff66','#7dff8a','#7dff8a','#e0ffe0']),
-    'amber': mkScheme('Amber CRT', '#100800','#ffb642','#ffb642',
-      ['#1a0e00','#ff7a2f','#ffb642','#ffd98a','#d98a2f','#ff9d4d','#ffc978','#ffe3b3',
-       '#7a5220','#ffa06a','#ffcf7a','#ffe6b0','#ffb642','#ffb98a','#ffe0b0','#fff4e0']),
-    'ice': mkScheme('Arctic Ice', '#f4f8fb','#0d2233','#0077cc',
-      ['#0d2233','#c62828','#1b7f4d','#9a6b00','#1565c0','#7b1fa2','#00787f','#cfd8dc',
-       '#546e7a','#e53935','#2e9e63','#c08a00','#1e88e5','#9c27b0','#00a3ab','#ffffff']),
-    'material': mkScheme('Material', '#263238','#eeffff','#ffcc00',
-      ['#000000','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff',
-       '#546e7a','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']),
-    'ayu-mirage': mkScheme('Ayu Mirage', '#1f2430','#cbccc6','#ffcc66',
-      ['#191e2a','#ed8274','#a6cc70','#fad07b','#6dcbfa','#cfbafa','#90e1c6','#c7c7c7',
-       '#686868','#f28779','#bae67e','#ffd580','#73d0ff','#d4bfff','#95e6cb','#ffffff']),
-    'ocean': mkScheme('Ocean', '#0d1b2a','#c5d8e8','#5bc0eb',
-      ['#0d1b2a','#e63946','#5bc0eb','#f4d35e','#457b9d','#c77dff','#48cae4','#e0e1dd',
-       '#3a4a5a','#ff6b6b','#7dd3fc','#ffe082','#6ea8cf','#d69dff','#7de0f0','#ffffff']),
-    'forest': mkScheme('Forest', '#0b1e0b','#c8e6c9','#66bb6a',
-      ['#0b1e0b','#e57373','#81c784','#ffd54f','#64b5f6','#ba68c8','#4db6ac','#e8f5e9',
-       '#3e5a3e','#ef9a9a','#a5d6a7','#ffe082','#90caf9','#ce93d8','#80cbc4','#ffffff']),
-    'sunset': mkScheme('Sunset', '#1a0e1e','#ffd8c2','#ff6b35',
-      ['#2a1628','#ff5252','#ffb142','#ffd93d','#7a5cff','#ff6bcb','#ff9f68','#ffe0d0',
-       '#5a2e4a','#ff7070','#ffc46a','#ffe970','#9a80ff','#ff90d8','#ffb88a','#ffffff'])
-  };
+  const SCHEMES = {};
+
+  /* Core HEX-AI native schemes */
+  SCHEMES['hex'] = mkScheme('HEX AI', '#04070c','#d7ffe9','#00ffa3',
+    ['#0b1016','#ff5c5c','#00ffa3','#ffd65c','#60a5ff','#ff5cdc','#00d9ff','#d7ffe9',
+     '#5c7385','#ff8a8a','#5cffc4','#ffe694','#96c2ff','#ff96e8','#6ce8ff','#ffffff']);
+  SCHEMES['ice'] = mkScheme('Arctic Ice', '#f4f8fb','#0d2233','#0077cc',
+    ['#0d2233','#c62828','#1b7f4d','#9a6b00','#1565c0','#7b1fa2','#00787f','#cfd8dc',
+     '#546e7a','#e53935','#2e9e63','#c08a00','#1e88e5','#9c27b0','#00a3ab','#ffffff']);
+
+  /* Faithful port of the termux-style color library (adi1090x/termux-style/colors). */
+  (function extendSchemes(){
+    const P = [
+      /* [id, displayName, bg, fg, cursor, [16 ansi colors]] */
+      ['termux','Termux Classic','#000000','#ffffff','#ffffff',
+        ['#000000','#cc0000','#4e9a06','#c4a000','#3465a4','#75507b','#06989a','#d3d7cf',
+         '#555753','#ef2929','#8ae234','#fce94f','#729fcf','#ad7fa8','#34e2e2','#eeeeec']],
+      ['dracula','Dracula','#282a36','#f8f8f2','#f8f8f2',
+        ['#21222c','#ff5555','#50fa7b','#f1fa8c','#bd93f9','#ff79c6','#8be9fd','#f8f8f2',
+         '#6272a4','#ff6e6e','#69ff94','#ffffa5','#d6acff','#ff92df','#a4ffff','#ffffff']],
+      ['gruvbox-dark','Gruvbox Dark','#282828','#ebdbb2','#ebdbb2',
+        ['#282828','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#a89984',
+         '#928374','#fb4934','#b8bb26','#fabd2f','#83a598','#d3869b','#8ec07c','#ebdbb2']],
+      ['gruvbox-light','Gruvbox Light','#fbf1c7','#3c3836','#3c3836',
+        ['#fbf1c7','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#7c6f64',
+         '#928374','#9d0006','#79740e','#b57614','#076678','#8f3f71','#427b58','#3c3836']],
+      ['nord','Nord','#2e3440','#d8dee9','#d8dee9',
+        ['#3b4252','#bf616a','#a3be8c','#ebcb8b','#81a1c1','#b48ead','#88c0d0','#e5e9f0',
+         '#4c566a','#bf616a','#a3be8c','#ebcb8b','#81a1c1','#b48ead','#8fbcbb','#eceff4']],
+      ['tokyonight','Tokyo Night','#1a1b26','#c0caf5','#c0caf5',
+        ['#15161e','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#a9b1d6',
+         '#414868','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#c0caf5']],
+      ['tokyonight-storm','Tokyo Night Storm','#24283b','#c0caf5','#c0caf5',
+        ['#1d202f','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#a9b1d6',
+         '#414868','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#c0caf5']],
+      ['tokyonight-moon','Tokyo Night Moon','#222436','#c8d3f5','#c8d3f5',
+        ['#1b1d2b','#ff757f','#c3e88d','#ffc777','#82aaff','#c099ff','#86e1fc','#828bb8',
+         '#444a73','#ff757f','#c3e88d','#ffc777','#82aaff','#c099ff','#86e1fc','#c8d3f5']],
+      ['tokyonight-day','Tokyo Night Day','#e1e2e7','#3760bf','#3760bf',
+        ['#e9e9ed','#f52a65','#587539','#8c6c3e','#2e7de9','#9854f1','#007197','#6172b0',
+         '#a1a6c5','#f52a65','#587539','#8c6c3e','#2e7de9','#9854f1','#007197','#3760bf']],
+      ['monokai','Monokai','#272822','#f8f8f2','#f8f8f0',
+        ['#272822','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f8f8f2',
+         '#75715e','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f9f8f5']],
+      ['solarized-dark','Solarized Dark','#002b36','#839496','#839496',
+        ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
+         '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']],
+      ['solarized-light','Solarized Light','#fdf6e3','#657b83','#657b83',
+        ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
+         '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']],
+      ['one-dark','One Dark','#282c34','#abb2bf','#528bff',
+        ['#282c34','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#abb2bf',
+         '#5c6370','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#ffffff']],
+      ['one-light','One Light','#fafafa','#383a42','#526fff',
+        ['#383a42','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#a0a1a7',
+         '#696c77','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#202227']],
+      ['catppuccin-mocha','Catppuccin Mocha','#1e1e2e','#cdd6f4','#f5e0dc',
+        ['#45475a','#f38ba8','#a6e3a1','#f9e2af','#89b4fa','#f5c2e7','#94e2d5','#bac2de',
+         '#585b70','#f38ba8','#a6e3a1','#f9e2af','#89b4fa','#f5c2e7','#94e2d5','#a6adc8']],
+      ['catppuccin-macchiato','Catppuccin Macchiato','#24273a','#cad3f5','#f4dbd6',
+        ['#494d64','#ed8796','#a6da95','#eed49f','#8aadf4','#f5bde6','#8bd5ca','#b8c0e0',
+         '#5b6078','#ed8796','#a6da95','#eed49f','#8aadf4','#f5bde6','#8bd5ca','#a5adcb']],
+      ['catppuccin-frappe','Catppuccin Frappé','#303446','#c6d0f5','#f2d5cf',
+        ['#51576d','#e78284','#a6d189','#e5c890','#8caaee','#f4b8e4','#81c8be','#b5bfe2',
+         '#626880','#e78284','#a6d189','#e5c890','#8caaee','#f4b8e4','#81c8be','#a5adce']],
+      ['catppuccin-latte','Catppuccin Latte','#eff1f5','#4c4f69','#dc8a78',
+        ['#5c5f77','#d20f39','#40a02b','#df8e1d','#1e66f5','#ea76cb','#179299','#acb0be',
+         '#6c6f85','#d20f39','#40a02b','#df8e1d','#1e66f5','#ea76cb','#179299','#bcc0cc']],
+      ['rose-pine','Rosé Pine','#191724','#e0def4','#524f67',
+        ['#26233a','#eb6f92','#31748f','#f6c177','#9ccfd8','#c4a7e7','#ebbcba','#e0def4',
+         '#6e6a86','#eb6f92','#31748f','#f6c177','#9ccfd8','#c4a7e7','#ebbcba','#e0def4']],
+      ['rose-pine-moon','Rosé Pine Moon','#232136','#e0def4','#56526e',
+        ['#393552','#eb6f92','#3e8fb0','#f6c177','#9ccfd8','#c4a7e7','#ea9a97','#e0def4',
+         '#6e6a86','#eb6f92','#3e8fb0','#f6c177','#9ccfd8','#c4a7e7','#ea9a97','#e0def4']],
+      ['rose-pine-dawn','Rosé Pine Dawn','#faf4ed','#575279','#cecacd',
+        ['#f2e9e1','#b4637a','#286983','#ea9d34','#56949f','#907aa9','#d7827e','#575279',
+         '#9893a5','#b4637a','#286983','#ea9d34','#56949f','#907aa9','#d7827e','#575279']],
+      ['everforest','Everforest Dark','#2d353b','#d3c6aa','#d3c6aa',
+        ['#475258','#e67e80','#a7c080','#dbbc7f','#7fbbb3','#d699b6','#83c092','#d3c6aa',
+         '#475258','#e67e80','#a7c080','#dbbc7f','#7fbbb3','#d699b6','#83c092','#d3c6aa']],
+      ['everforest-light','Everforest Light','#fdf6e3','#5c6a72','#5c6a72',
+        ['#fdf6e3','#f85552','#8da101','#dfa000','#3a94c5','#df69ba','#35a77c','#5c6a72',
+         '#a6b0a0','#f85552','#8da101','#dfa000','#3a94c5','#df69ba','#35a77c','#5c6a72']],
+      ['kanagawa','Kanagawa','#1f1f28','#dcd7ba','#c8c093',
+        ['#16161d','#c34043','#76946a','#c0a36e','#7e9cd8','#957fb8','#6a9589','#c8c093',
+         '#727169','#e82424','#98bb6c','#e6c384','#7fb4ca','#938aa9','#7aa89f','#dcd7ba']],
+      ['kanagawa-dragon','Kanagawa Dragon','#181616','#c5c9c5','#c8c093',
+        ['#0d0c0c','#c4746e','#8a9a7b','#c4b28a','#8ba4b0','#a292a3','#8ea4a2','#c8c093',
+         '#a6a69c','#e46876','#87a987','#e6c384','#7fb4ca','#938aa9','#7aa89f','#c5c9c5']],
+      ['kanagawa-lotus','Kanagawa Lotus','#f2ecbc','#545464','#43436c',
+        ['#1f1f28','#c84053','#6f894e','#77713f','#4d699b','#b35b79','#597b75','#545464',
+         '#8a8980','#d7474b','#6f894e','#836f4a','#6693bf','#624c83','#5e857a','#43436c']],
+      ['night-owl','Night Owl','#011627','#d6deeb','#80a4c2',
+        ['#011627','#ef5350','#22da6e','#addb67','#82aaff','#c792ea','#21c7a8','#ffffff',
+         '#575656','#ef5350','#22da6e','#ffeb95','#82aaff','#c792ea','#7fdbca','#ffffff']],
+      ['palenight','Palenight','#292d3e','#a6accd','#ffcc00',
+        ['#292d3e','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#d0d0d0',
+         '#676e95','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']],
+      ['synthwave','Synthwave 84','#262335','#ffffff','#f92aad',
+        ['#241b2f','#fe4450','#72f1b8','#fede5d','#36f9f6','#ff8b39','#ff7edb','#ffffff',
+         '#4c3f6b','#fe4450','#72f1b8','#fede5d','#36f9f6','#ff8b39','#ff7edb','#ffffff']],
+      ['cyberpunk','Cyberpunk','#0a0a12','#e0e0ff','#ff003c',
+        ['#0a0a12','#ff003c','#00ff9f','#fcee0a','#00b3ff','#ff00e5','#00fff0','#e0e0ff',
+         '#3a3a5a','#ff5c8a','#7dffc8','#fff770','#5cc8ff','#ff70f0','#70fff0','#ffffff']],
+      ['matrix','Matrix','#000700','#00ff41','#00ff41',
+        ['#001100','#00cc33','#00ff41','#7dff8a','#00aa22','#00dd55','#33ff66','#b6ffb6',
+         '#005500','#33ff66','#7dff8a','#b6ffb6','#33ff66','#7dff8a','#7dff8a','#e0ffe0']],
+      ['amber','Amber CRT','#100800','#ffb642','#ffb642',
+        ['#1a0e00','#ff7a2f','#ffb642','#ffd98a','#d98a2f','#ff9d4d','#ffc978','#ffe3b3',
+         '#7a5220','#ffa06a','#ffcf7a','#ffe6b0','#ffb642','#ffb98a','#ffe0b0','#fff4e0']],
+      ['material','Material','#263238','#eeffff','#ffcc00',
+        ['#000000','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff',
+         '#546e7a','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']],
+      ['material-darker','Material Darker','#212121','#eeffff','#ffcc00',
+        ['#000000','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff',
+         '#545454','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']],
+      ['material-ocean','Material Ocean','#0f111a','#8f93a2','#ffcc00',
+        ['#000000','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff',
+         '#464b5d','#ff5370','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']],
+      ['material-palenight','Material Palenight','#292d3e','#a6accd','#ffcc00',
+        ['#292d3e','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#d0d0d0',
+         '#676e95','#f07178','#c3e88d','#ffcb6b','#82aaff','#c792ea','#89ddff','#ffffff']],
+      ['ayu-mirage','Ayu Mirage','#1f2430','#cbccc6','#ffcc66',
+        ['#191e2a','#ed8274','#a6cc70','#fad07b','#6dcbfa','#cfbafa','#90e1c6','#c7c7c7',
+         '#686868','#f28779','#bae67e','#ffd580','#73d0ff','#d4bfff','#95e6cb','#ffffff']],
+      ['ayu-dark','Ayu Dark','#0a0e14','#b3b1ad','#e6b450',
+        ['#01060e','#ea6c73','#91b362','#f9af4f','#53bdfa','#fae994','#90e1c6','#c7c7c7',
+         '#686868','#f07178','#c2d94c','#ffb454','#59c2ff','#ffee99','#95e6cb','#ffffff']],
+      ['ayu-light','Ayu Light','#fafafa','#5c6773','#ff9940',
+        ['#000000','#ff3333','#86b300','#f29718','#41a6d9','#a37acc','#4dbf99','#ffffff',
+         '#323232','#ff6565','#b8cc52','#ffb454','#59c2ff','#d2a6ff','#95e6cb','#ffffff']],
+      ['ocean','Ocean','#0d1b2a','#c5d8e8','#5bc0eb',
+        ['#0d1b2a','#e63946','#5bc0eb','#f4d35e','#457b9d','#c77dff','#48cae4','#e0e1dd',
+         '#3a4a5a','#ff6b6b','#7dd3fc','#ffe082','#6ea8cf','#d69dff','#7de0f0','#ffffff']],
+      ['forest','Forest','#0b1e0b','#c8e6c9','#66bb6a',
+        ['#0b1e0b','#e57373','#81c784','#ffd54f','#64b5f6','#ba68c8','#4db6ac','#e8f5e9',
+         '#3e5a3e','#ef9a9a','#a5d6a7','#ffe082','#90caf9','#ce93d8','#80cbc4','#ffffff']],
+      ['sunset','Sunset','#1a0e1e','#ffd8c2','#ff6b35',
+        ['#2a1628','#ff5252','#ffb142','#ffd93d','#7a5cff','#ff6bcb','#ff9f68','#ffe0d0',
+         '#5a2e4a','#ff7070','#ffc46a','#ffe970','#9a80ff','#ff90d8','#ffb88a','#ffffff']],
+      ['cobalt2','Cobalt2','#193549','#ffffff','#ffc600',
+        ['#000000','#ff628c','#3ad900','#ffc600','#0088ff','#fb94ff','#80fcff','#ffffff',
+         '#808080','#ff628c','#3ad900','#ffc600','#0088ff','#fb94ff','#80fcff','#ffffff']],
+      ['shades-of-purple','Shades of Purple','#2d2b55','#ffffff','#fad000',
+        ['#000000','#ec3a37','#3ad900','#fad000','#6943ff','#ff2c70','#80fcff','#a599e9',
+         '#a599e9','#ec3a37','#3ad900','#fad000','#6943ff','#ff2c70','#80fcff','#ffffff']],
+      ['snazzy','Snazzy','#282a36','#eff0eb','#97979b',
+        ['#000000','#ff5c57','#5af78e','#f3f99d','#57c7ff','#ff6ac1','#9aedfe','#f1f1f0',
+         '#686868','#ff5c57','#5af78e','#f3f99d','#57c7ff','#ff6ac1','#9aedfe','#f1f1f0']],
+      ['horizon','Horizon','#1c1e26','#e0e0e0','#e95678',
+        ['#000000','#e95678','#29d398','#fab795','#26bbd9','#ee64ac','#59e3e3','#e0e0e0',
+         '#6c6f93','#ec6a88','#3fdaa4','#fbc3a7','#3fc6de','#f075b7','#6be6e6','#ffffff']],
+      ['iceberg','Iceberg','#161821','#c6c8d1','#c6c8d1',
+        ['#1e2132','#e27878','#b4be82','#e2a478','#84a0c6','#a093c7','#89b8c2','#c6c8d1',
+         '#6b7089','#e98989','#c0ca8e','#e9b189','#91acd1','#ada0d3','#95c4ce','#d2d4de']],
+      ['gotham','Gotham','#0c1014','#99d1ce','#99d1ce',
+        ['#0c1014','#c23127','#33859e','#edb443','#195466','#4c93aa','#2aa889','#99d1ce',
+         '#3d5059','#c23127','#33859e','#edb443','#195466','#4c93aa','#2aa889','#99d1ce']],
+      ['hybrid','Hybrid','#161719','#c5c8c6','#c5c8c6',
+        ['#2a2e33','#b84d51','#b3bf5a','#e4b55e','#6e90b0','#a17eac','#7fbfb4','#b5b9b6',
+         '#2a2e33','#b84d51','#b3bf5a','#e4b55e','#6e90b0','#a17eac','#7fbfb4','#b5b9b6']],
+      ['oceanic-next','Oceanic Next','#1b2b34','#c0c5ce','#c0c5ce',
+        ['#343d46','#ec5f67','#99c794','#fac863','#6699cc','#c594c5','#5fb3b3','#d8dee9',
+         '#65737e','#ec5f67','#99c794','#fac863','#6699cc','#c594c5','#5fb3b3','#d8dee9']],
+      ['papercolor-dark','PaperColor Dark','#1c1c1c','#808080','#d0d0d0',
+        ['#1c1c1c','#af005f','#5faf00','#d7af5f','#5fafd7','#808080','#d7875f','#d0d0d0',
+         '#585858','#5faf5f','#afd700','#af87d7','#ffaf00','#ff5faf','#00afaf','#5f8787']],
+      ['papercolor-light','PaperColor Light','#eeeeee','#444444','#878787',
+        ['#eeeeee','#af0000','#008700','#5f8700','#0087af','#878787','#005f87','#444444',
+         '#bcbcbc','#d70000','#d70087','#8700af','#d75f00','#d75f00','#005faf','#005f87']],
+      ['pencil-dark','Pencil Dark','#212121','#f1f1f1','#f1f1f1',
+        ['#212121','#c30771','#10a778','#a89c14','#008ec4','#523c79','#20a5ba','#d9d9d9',
+         '#424242','#fb007a','#5fd7af','#f3e430','#20bbfc','#6855de','#4fb8cc','#f1f1f1']],
+      ['pencil-light','Pencil Light','#f1f1f1','#424242','#424242',
+        ['#212121','#c30771','#10a778','#a89c14','#008ec4','#523c79','#20a5ba','#d9d9d9',
+         '#424242','#fb007a','#5fd7af','#f3e430','#20bbfc','#6855de','#4fb8cc','#f1f1f1']],
+      ['plain-dark','Plain Dark','#1b1d1e','#f8f8f2','#f8f8f0',
+        ['#1b1d1e','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f8f8f2',
+         '#505354','#ff5995','#b6e354','#feed6c','#8cedff','#9e6ffe','#899ca1','#f8f8f2']],
+      ['spacegray','SpaceGray','#2d2d2d','#b3b8c3','#b3b8c3',
+        ['#000000','#b04b57','#87b379','#e5c179','#7d8fa9','#a47996','#85a7a5','#b3b8c3',
+         '#434343','#b04b57','#87b379','#e5c179','#7d8fa9','#a47996','#85a7a5','#ffffff']],
+      ['srcery','Srcery','#1c1b19','#fce8c3','#fbb829',
+        ['#1c1b19','#ef2f27','#519f50','#fbb829','#2c78bf','#e02c6d','#0aaeb3','#baa67f',
+         '#918175','#f75341','#98bc37','#fed06e','#68a8e4','#ff5c8f','#2be4d0','#fce8c3']],
+      ['sublime','Sublime','#151718','#ffffff','#ffffff',
+        ['#151718','#cd3f45','#9ece6a','#e6cd69','#7aa2f7','#9f7efe','#7dcfff','#c0caf5',
+         '#4a5259','#cd3f45','#9ece6a','#e6cd69','#7aa2f7','#9f7efe','#7dcfff','#c0caf5']],
+      ['tomorrow-night','Tomorrow Night','#1d1f21','#c5c8c6','#c5c8c6',
+        ['#1d1f21','#cc6666','#b5bd68','#f0c674','#81a2be','#b294bb','#8abeb7','#c5c8c6',
+         '#969896','#cc6666','#b5bd68','#f0c674','#81a2be','#b294bb','#8abeb7','#ffffff']],
+      ['twilight','Twilight','#141414','#ffffd4','#ffffd4',
+        ['#141414','#cf6a4c','#8f9d6a','#f9ee98','#7587a6','#9b859d','#afc4db','#a7a7a7',
+         '#5f5a60','#cf6a4c','#8f9d6a','#f9ee98','#7587a6','#9b859d','#afc4db','#ffffff']],
+      ['wombat','Wombat','#202020','#e3e0d7','#e3e0d7',
+        ['#202020','#ff615a','#b1e969','#ebd99c','#5da9f6','#e86aff','#82fff7','#dedacf',
+         '#313131','#f58c80','#ddf88f','#eee5b2','#a5c7ff','#ddaaff','#b7fff9','#ffffff']],
+      ['zenburn','Zenburn','#3f3f3f','#dcdccc','#73635a',
+        ['#3f3f3f','#cc9393','#7f9f7f','#f0dfaf','#6f8fa0','#dc8cc3','#93e0e3','#dcdccc',
+         '#709080','#dca3a3','#c3bf9f','#e0cf9f','#94bff3','#ec93d3','#93e0e3','#ffffff']],
+      ['atom-one-dark','Atom One Dark','#282c34','#abb2bf','#528bff',
+        ['#282c34','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#abb2bf',
+         '#5c6370','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#ffffff']],
+      ['atom-one-light','Atom One Light','#fafafa','#383a42','#526fff',
+        ['#383a42','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#a0a1a7',
+         '#696c77','#e45649','#50a14f','#c18401','#4078f2','#a626a4','#0184bc','#202227']],
+      ['brogrammer','Brogrammer','#131313','#d6dbe5','#d6dbe5',
+        ['#1f1f1f','#f81118','#2dc55e','#ecba0f','#2a84d2','#4e5ab7','#1081d6','#d6dbe5',
+         '#d6dbe5','#de352e','#1dd361','#f3bd09','#1081d6','#5350b9','#0f7ddb','#ffffff']],
+      ['campbell','Campbell','#0c0c0c','#cccccc','#ffffff',
+        ['#0c0c0c','#c50f1f','#13a10e','#c19c00','#0037da','#881798','#3a96dd','#cccccc',
+         '#767676','#e74856','#16c60c','#f9f1a5','#3b78ff','#b4009e','#61d6d6','#f2f2f2']],
+      ['clrs','CLRS','#181818','#f2f2f2','#f2f2f2',
+        ['#181818','#ea51b2','#8bd49c','#f2e3b3','#4a8ee0','#a174d4','#52b8b0','#f2f2f2',
+         '#4d4d4d','#ff6666','#a5ff90','#ffe873','#75d4ff','#d19fff','#7de4d9','#ffffff']],
+      ['arthur','Arthur','#181818','#e6e6e6','#e6e6e6',
+        ['#181818','#cc5533','#88aa22','#ccaa33','#5377aa','#aa55cc','#22ccaa','#e6e6e6',
+         '#4d4d4d','#ff8866','#aaff33','#ffcc44','#6699ff','#cc77ee','#44ffcc','#ffffff']],
+      ['adwaita-dark','Adwaita Dark','#1d1d20','#ffffff','#ffffff',
+        ['#241f31','#c01c28','#2ec27e','#f5c211','#1e78e4','#9841bb','#0ab9dc','#c0bfbc',
+         '#5e5c64','#ed333b','#57e389','#f8e45c','#51a1ff','#c061cb','#4fd2fd','#f6f5f4']],
+      ['afterglow','Afterglow','#212121','#d0d0d0','#d0d0d0',
+        ['#151515','#a53c23','#7b9246','#d3a04d','#6c99bb','#9f4e85','#7dd6cf','#d0d0d0',
+         '#505050','#a53c23','#7b9246','#d3a04d','#6c99bb','#9f4e85','#7dd6cf','#f5f5f5']],
+      ['argonaut','Argonaut','#0e1019','#ffffff','#ff0018',
+        ['#232323','#ff000f','#8ce10b','#ffb900','#008df8','#6d43a6','#00d8eb','#ffffff',
+         '#444444','#ff2740','#abe15b','#ffd242','#0092ff','#9a5feb','#67fff0','#ffffff']],
+      ['asciinema','Asciinema','#121314','#cccccc','#cccccc',
+        ['#000000','#dd3c69','#4ebf22','#ddaf3c','#26b0d7','#b954e1','#54e1b9','#d9d9d9',
+         '#4d4d4d','#dd3c69','#4ebf22','#ddaf3c','#26b0d7','#b954e1','#54e1b9','#ffffff']],
+      ['atelier-cave','Atelier Cave','#19171c','#8b8792','#8b8792',
+        ['#19171c','#be4678','#2a9292','#a06e3b','#576ddb','#955ae7','#398bc6','#8b8792',
+         '#655f6d','#be4678','#2a9292','#a06e3b','#576ddb','#955ae7','#398bc6','#efecf4']],
+      ['batman','Batman','#1b1d1e','#6f6f6f','#fcef0c',
+        ['#1b1d1e','#e6dc44','#c8be46','#f4fd22','#737174','#747271','#62605f','#c6c5bf',
+         '#505354','#fff78e','#fff27d','#feed6c','#919495','#9a9a9d','#a3a3a6','#dadbd6']],
+      ['birds-of-paradise','Birds of Paradise','#2a1f1d','#e0dbb7','#573d26',
+        ['#573d26','#be2d26','#6ba18a','#e99d2a','#5a86ad','#ac80a6','#74a6ad','#e0dbb7',
+         '#9b6c4a','#e84627','#95d8ba','#d0d150','#b8d3ed','#d19ecb','#93cfd7','#fff9d5']],
+      ['blazer','Blazer','#0d1926','#d9e6f2','#d9e6f2',
+        ['#000000','#b87a7a','#7ab87a','#b8b87a','#7a7ab8','#b87ab8','#7ab8b8','#d9d9d9',
+         '#262626','#dbbdbd','#bddbbd','#dbdbbd','#bdbddb','#dbbddb','#bddbdb','#ffffff']],
+      ['borland','Borland','#000000','#ffff4e','#ffff4e',
+        ['#4f4f4f','#ff6c60','#a8ff60','#ffffb6','#96cbfe','#ff73fd','#c6c5fe','#eeeeee',
+         '#7c7c7c','#ffb6b0','#ceffab','#ffffcb','#b5dcfe','#ff9cfe','#dfdffe','#ffffff']],
+      ['broadcast','Broadcast','#2b2b2b','#e6e1dc','#ffffff',
+        ['#000000','#da4939','#519f50','#ffd24a','#6d9cbe','#d0d0ff','#6e9cbe','#ffffff',
+         '#323232','#ff7b6b','#83d683','#ffd24a','#83a5c8','#e2e2ff','#83d6d6','#ffffff']],
+      ['builtin-dark','Builtin Dark','#000000','#bbbbbb','#bbbbbb',
+        ['#000000','#bb0000','#00bb00','#bbbb00','#0000bb','#bb00bb','#00bbbb','#bbbbbb',
+         '#555555','#ff5555','#55ff55','#ffff55','#5555ff','#ff55ff','#55ffff','#ffffff']],
+      ['builtin-light','Builtin Light','#ffffff','#000000','#000000',
+        ['#000000','#bb0000','#00bb00','#bbbb00','#0000bb','#bb00bb','#00bbbb','#bbbbbb',
+         '#555555','#ff5555','#55ff55','#ffff55','#5555ff','#ff55ff','#55ffff','#ffffff']],
+      ['builtin-pastel-dark','Builtin Pastel Dark','#000000','#bbbbbb','#bbbbbb',
+        ['#4f4f4f','#ff6c60','#a8ff60','#ffffb6','#96cbfe','#ff73fd','#c6c5fe','#eeeeee',
+         '#7c7c7c','#ffb6b0','#ceffab','#ffffcb','#b5dcfe','#ff9cfe','#dfdffe','#ffffff']],
+      ['builtin-solarized-dark','Builtin Solarized Dark','#002b36','#839496','#839496',
+        ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
+         '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']],
+      ['builtin-solarized-light','Builtin Solarized Light','#fdf6e3','#657b83','#657b83',
+        ['#073642','#dc322f','#859900','#b58900','#268bd2','#d33682','#2aa198','#eee8d5',
+         '#002b36','#cb4b16','#586e75','#657b83','#839496','#6c71c4','#93a1a1','#fdf6e3']],
+      ['builtin-tango-dark','Builtin Tango Dark','#000000','#ffffff','#ffffff',
+        ['#000000','#cc0000','#4e9a06','#c4a000','#3465a4','#75507b','#06989a','#d3d7cf',
+         '#555753','#ef2929','#8ae234','#fce94f','#729fcf','#ad7fa8','#34e2e2','#eeeeec']],
+      ['builtin-tango-light','Builtin Tango Light','#ffffff','#000000','#000000',
+        ['#000000','#cc0000','#4e9a06','#c4a000','#3465a4','#75507b','#06989a','#d3d7cf',
+         '#555753','#ef2929','#8ae234','#fce94f','#729fcf','#ad7fa8','#34e2e2','#eeeeec']],
+      ['c64','C64','#40318d','#7869c4','#7869c4',
+        ['#090300','#883932','#55a049','#bfce72','#40318d','#8b3f96','#67b6bd','#ffffff',
+         '#000000','#883932','#55a049','#bfce72','#40318d','#8b3f96','#67b6bd','#f7f7f7']],
+      ['chameleon','Chameleon','#2c2c2c','#dedede','#dedede',
+        ['#2c2c2c','#cc241d','#98971a','#d79921','#458588','#b16286','#689d6a','#dedede',
+         '#7c7c7c','#fb4934','#b8bb26','#fabd2f','#83a598','#d3869b','#8ec07c','#ffffff']],
+      ['chalkboard','Chalkboard','#29262f','#d9e6f2','#d9e6f2',
+        ['#29262f','#c37372','#72c373','#c2c372','#aaaadb','#dbb0bd','#aaaccc','#d9d9d9',
+         '#404040','#dbaaaa','#aadbaa','#dadbaa','#aaaadb','#dbaada','#aadadb','#ffffff']],
+      ['clarity','Clarity','#1e1e1e','#e0e0e0','#e0e0e0',
+        ['#262626','#e04545','#3fb950','#e3b341','#58a6ff','#a371f7','#39c5cf','#e6edf3',
+         '#5e5e5e','#ff5c5c','#56d364','#f0c674','#79c0ff','#bc8cff','#56d4dd','#ffffff']],
+      ['dark-pastel','Dark Pastel','#181818','#bbbbbb','#bbbbbb',
+        ['#5f5a60','#ff6c60','#a8ff60','#ffffb6','#96cbfe','#ff73fd','#c6c5fe','#eeeeee',
+         '#7c7c7c','#ffb6b0','#ceffab','#ffffcb','#b5dcfe','#ff9cfe','#dfdffe','#ffffff']],
+      ['darkside','Darkside','#181818','#bababa','#bababa',
+        ['#000000','#e8341c','#68c256','#f2d42c','#1c98e8','#8e69c9','#1c98e8','#bababa',
+         '#404040','#e05a4f','#77b869','#efd64b','#387cd3','#957bbe','#3d97e2','#bababa']],
+      ['desert','Desert','#333333','#ffffff','#ffffff',
+        ['#4d4d4d','#ff2b2b','#98fb98','#f0e68c','#cd853f','#ffdead','#ffa0a0','#f5deb3',
+         '#808080','#ff5555','#87ceeb','#ffff55','#ff9500','#ffcccb','#ffb3b3','#ffffff']],
+      ['dimmed-monokai','Dimmed Monokai','#1f1f1f','#b9bcba','#b9bcba',
+        ['#2f2f2f','#be3f48','#879a3b','#c5a635','#4f76a1','#855c8d','#578fa4','#b9bcba',
+         '#616161','#d16a70','#b4c04e','#e0c56a','#7fa3c7','#b58eb6','#8fd4d9','#f0f0f0']],
+      ['dorothy','Dorothy','#1d1d1d','#e6e6e6','#e6e6e6',
+        ['#1d1d1d','#ff5c57','#5af78e','#f3f99d','#57c7ff','#ff6ac1','#9aedfe','#f1f1f0',
+         '#4a4a4a','#ff5c57','#5af78e','#f3f99d','#57c7ff','#ff6ac1','#9aedfe','#ffffff']],
+      ['duckbones','Duckbones','#0e101a','#ebefc0','#ebefc0',
+        ['#0e101a','#e03600','#7a972c','#dca35c','#5f91d0','#9a7fdd','#4fa2a3','#ebefc0',
+         '#4a4d5e','#ff6a4d','#a3c157','#ffcc8a','#7fb3ff','#c1a4ff','#6dcdcd','#ebefc0']],
+      ['espresso','Espresso','#323232','#ffffff','#ffffff',
+        ['#353535','#d25252','#a5c261','#ffc66d','#6c99bb','#d197d9','#bed6ff','#eeeeec',
+         '#535353','#f00c0c','#c2e075','#e1e48b','#8ab7d9','#efb5f7','#dcf4ff','#ffffff']],
+      ['faded','Faded','#202020','#dedede','#dedede',
+        ['#3a3a3a','#c3644d','#a8d06c','#f4c96a','#6c9bd0','#c48fbd','#6fc3bd','#dedede',
+         '#5c5c5c','#e07b5e','#c0e885','#ffdb87','#83b3e8','#d8a5d2','#84dcd6','#ffffff']],
+      ['flat','Flat','#1f2229','#ffffff','#ffffff',
+        ['#1f2229','#d41919','#5eae70','#f4b940','#5182b9','#a45c8e','#57c7c7','#b3b8c3',
+         '#414750','#ec4f4f','#7ecb8b','#ffcf62','#73a3d6','#c586ab','#7cd7d7','#ffffff']],
+      ['flatland','Flatland','#1d1f21','#b8b8b8','#b8b8b8',
+        ['#1d1d19','#f1833a','#9bc53d','#f4c542','#3a7bcc','#ac70bf','#43c3c3','#b8b8b8',
+         '#4c4c4c','#f1833a','#9bc53d','#f4c542','#3a7bcc','#ac70bf','#43c3c3','#ffffff']],
+      ['github','GitHub','#ffffff','#24292f','#24292f',
+        ['#24292f','#cf222e','#116329','#4d2d00','#0969da','#8250df','#1b7c83','#6e7781',
+         '#57606a','#a40e26','#1a7f37','#633c01','#218bff','#a475f9','#3192aa','#8c959f']],
+      ['github-dark','GitHub Dark','#0d1117','#c9d1d9','#c9d1d9',
+        ['#484f58','#ff7b72','#3fb950','#d29922','#58a6ff','#bc8cff','#39c5cf','#b1bac4',
+         '#6e7681','#ffa198','#56d364','#e3b341','#79c0ff','#d2a8ff','#56d4dd','#f0f6fc']],
+      ['grape','Grape','#171423','#9f9fa1','#9f9fa1',
+        ['#2d283f','#ed2261','#1fa91b','#8ddc20','#487df4','#8d35c9','#3bdeed','#9e9ea0',
+         '#59516a','#f0729a','#53aa5e','#b2dc87','#a9bcec','#ad81c2','#9de3eb','#a288f7']],
+      ['grass','Grass','#13773d','#fff0a5','#fff0a5',
+        ['#000000','#b64926','#8eb33b','#ffb03b','#4a86c8','#d498b6','#4a8d96','#fff0a5',
+         '#40543e','#d4826a','#b7d97e','#ffc974','#7cb1e3','#e6b9d0','#72b1bb','#ffffff']],
+      ['hardcore','Hardcore','#121212','#a0a0a0','#a0a0a0',
+        ['#1b1b1b','#f92672','#a6e22e','#fd971f','#66d9ef','#9e6ffe','#5e7175','#a0a0a0',
+         '#505354','#ff669d','#beed5f','#ffb258','#73dffe','#a288f7','#7ec4c1','#ffffff']],
+      ['highway','Highway','#222225','#ededed','#ededed',
+        ['#000000','#d00000','#58a400','#f0a800','#006fb7','#d0009d','#009d9d','#bbbbbb',
+         '#5e5e5e','#ff4d4d','#7cd645','#ffcc45','#3ba3ff','#ff3bd4','#3bd4d4','#ffffff']],
+      ['homebrew','Homebrew','#000000','#00ff00','#00ff00',
+        ['#000000','#990000','#00a600','#999900','#0000b2','#b200b2','#00a6b2','#bfbfbf',
+         '#666666','#e50000','#00d900','#e5e500','#0000ff','#e500e5','#00e5e5','#e5e5e5']],
+      ['hurtado','Hurtado','#000000','#dbdbdb','#dbdbdb',
+        ['#575757','#ff1b00','#a5df55','#fbe74a','#487df4','#8c56c1','#3bdeed','#dbdbdb',
+         '#262626','#d51d00','#a5df55','#fbe74a','#487df4','#8c56c1','#3bdeed','#ffffff']],
+      ['ir-black','IR Black','#000000','#f1f1f1','#f1f1f1',
+        ['#4f4f4f','#ff6c60','#a8ff60','#ffffb6','#96cbfe','#ff73fd','#c6c5fe','#eeeeee',
+         '#7c7c7c','#ffb6b0','#ceffab','#ffffcb','#b5dcfe','#ff9cfe','#dfdffe','#ffffff']],
+      ['jackie-brown','Jackie Brown','#2c1d16','#ffcc2f','#ffcc2f',
+        ['#2c1d16','#ef5734','#2baf2b','#bebf00','#246eb2','#d05ec1','#00acee','#bfbfbf',
+         '#666666','#e50000','#86a93e','#e5e500','#0000ff','#e500e5','#00e5e5','#e5e5e5']],
+      ['japanesque','Japanesque','#1e1e1e','#f7f6ec','#f7f6ec',
+        ['#595959','#cf3f61','#7bb75b','#e8c56a','#4e90c4','#a57fc9','#70c2c3','#f7f6ec',
+         '#5c5c5c','#e15d7f','#8fce6d','#ffd982','#64aee8','#c39ae6','#89d9da','#ffffff']],
+      ['jellybeans','Jellybeans','#121212','#dedede','#dedede',
+        ['#929292','#e27373','#94b979','#ffba7b','#97bedc','#e1c0fa','#00988e','#dedede',
+         '#bdbdbd','#ffa1a1','#bddeab','#ffdca0','#b1d8f6','#fbdaff','#1ab2a8','#ffffff']],
+      ['jetbrains-darcula','JetBrains Darcula','#202020','#adadad','#adadad',
+        ['#000000','#fa5355','#126e00','#c2c300','#4581eb','#fa54ff','#33c2c1','#adadad',
+         '#555555','#fb7172','#67ff4f','#ffff00','#6d9df1','#fb82ff','#60d3d1','#eeeeee']],
+      ['lasunya','Lasunya','#1a1a1a','#bdbdbd','#bdbdbd',
+        ['#1a1a1a','#ff5c57','#b7d463','#ffcb6b','#5da9f6','#c792ea','#89ddff','#f1f1f0',
+         '#424242','#ff7b72','#cee07d','#ffd580','#79b8ff','#d8b0ff','#a0e9ff','#ffffff']],
+      ['later-this-evening','Later This Evening','#222222','#979ba2','#979ba2',
+        ['#2b2b2b','#d45b5b','#7f9c5b','#d5a567','#6e94bb','#a67fb6','#5fa4a3','#979ba2',
+         '#5c5c5c','#e07676','#9dbd75','#ebc27e','#8cb3da','#c49bd8','#78c5c3','#c8cad0']],
+      ['lavandula','Lavandula','#050014','#736e7d','#736e7d',
+        ['#230046','#7d1625','#337e6f','#7f6f49','#4f4a7f','#5a3f7f','#58777f','#736e7d',
+         '#372d46','#e05167','#52e0c4','#e0c386','#8e87e0','#a776e0','#9ad4e0','#8c91fa']],
+      ['liquid-carbon','Liquid Carbon','#303030','#afc2c2','#afc2c2',
+        ['#000000','#ff3030','#559a70','#ccac00','#0099cc','#cc69c8','#7ac4cc','#bccccc',
+         '#000000','#ff3030','#559a70','#ccac00','#0099cc','#cc69c8','#7ac4cc','#bccccc']],
+      ['londontown','London Town','#1d1d1d','#cfcfcf','#cfcfcf',
+        ['#1d1d1d','#e5615f','#79a861','#e0b45f','#5f9ec4','#b77fb3','#5fb3a1','#cfcfcf',
+         '#4d4d4d','#ff6e6c','#8fc177','#f7c96d','#6fb1d8','#cc93c7','#6dc9b6','#ffffff']],
+      ['lucario','Lucario','#202020','#e0e0e0','#e0e0e0',
+        ['#202020','#c34043','#76946a','#c0a36e','#7e9cd8','#957fb8','#6a9589','#c8c093',
+         '#4d4d4d','#d1645c','#8fb380','#dbb77f','#95b0e5','#ab90ce','#7fb0a1','#ffffff']],
+      ['maia','Maia','#272727','#e2e2e2','#e2e2e2',
+        ['#3a3a3a','#d0646e','#7ba05b','#c9a554','#5b8fb0','#a26a9f','#5ba8a0','#e2e2e2',
+         '#5c5c5c','#e0787f','#93b86e','#e0bb68','#74a7c9','#b783b7','#6ec2b9','#ffffff']],
+      ['mandrake','Mandrake','#0e101a','#ebefc0','#ebefc0',
+        ['#0e101a','#ff0090','#33ff00','#ffd800','#00b0ff','#b093ff','#00e5ff','#ebefc0',
+         '#4a4d5e','#ff4daa','#66ff33','#ffe652','#4dc4ff','#c7b3ff','#4deaff','#ffffff']],
+      ['mariana','Mariana','#343d46','#d8dee9','#d8dee9',
+        ['#000000','#ec5f67','#99c794','#fac863','#6699cc','#c594c5','#5fb3b3','#d8dee9',
+         '#4a5260','#ec5f67','#99c794','#fac863','#6699cc','#c594c5','#5fb3b3','#d8dee9']],
+      ['mathias','Mathias','#000000','#bbbbbb','#f2d42c',
+        ['#000000','#e52222','#a6e32d','#fc951e','#5555ff','#c040be','#48b685','#cccccc',
+         '#555555','#ff5555','#55ff55','#ffff55','#5555ff','#ff55ff','#55ffff','#ffffff']],
+      ['medallion','Medallion','#1d1908','#cac296','#cac296',
+        ['#000000','#a1422d','#7d8a26','#ad8e29','#7764a2','#a1518c','#7e8a80','#cac296',
+         '#5e5443','#c85f3d','#a1ac44','#dfc24a','#a090d4','#d76eb5','#a5b29c','#f2ecc6']],
+      ['miami-vice','Miami Vice','#1b1d2b','#f2f2f2','#ff7edb',
+        ['#1b1d2b','#ff3d81','#26ff8a','#ffe14d','#26b6ff','#d762ff','#26ffe5','#f2f2f2',
+         '#3f425a','#ff6b9e','#66ffa8','#ffee87','#6ecbff','#e690ff','#66fff0','#ffffff']],
+      ['mirage','Mirage','#1b2738','#a6b2c0','#a6b2c0',
+        ['#1b2738','#ff9999','#85cc95','#ffcdb2','#7fb5e6','#c397d8','#85c8c8','#f2f2f2',
+         '#4c5971','#ffb3b3','#a3dba9','#ffe0c4','#99c7f1','#d4b3e6','#a1dede','#ffffff']],
+      ['molokai','Molokai','#1b1d1e','#bbbbbb','#bbbbbb',
+        ['#1b1d1e','#f92672','#a6e22e','#fd971f','#66d9ef','#9e6ffe','#5e7175','#a0a0a0',
+         '#505354','#ff669d','#beed5f','#ffb258','#73dffe','#a288f7','#7ec4c1','#ffffff']],
+      ['monalisa','Monalisa','#120b0d','#f7d6b2','#f7d6b2',
+        ['#120b0d','#c33731','#62aa5a','#e5c276','#5c94c1','#b968a0','#63c1b6','#f7d6b2',
+         '#4a3a3c','#ff5555','#7dc471','#ffd98a','#74aad8','#d17db9','#78dad0','#ffffff']],
+      ['neon','Neon','#0d0221','#ffffff','#f6019d',
+        ['#1a0033','#ff3860','#26ff8a','#ffd23f','#2196f3','#d94fff','#00f5d4','#ffffff',
+         '#3d0066','#ff5c7c','#4dffa1','#ffe16e','#4db0ff','#e57fff','#33ffd9','#ffffff']],
+      ['neutron','Neutron','#1c1e22','#f5f5f5','#f5f5f5',
+        ['#23252b','#b54036','#5ab977','#deb566','#6a7c93','#a4799d','#3f94a8','#e6e8ef',
+         '#3f4045','#db6161','#7de08b','#f0c987','#8ba5c4','#c78cbf','#58b8d3','#ffffff']],
+      ['nova','Nova','#3c4c55','#c5d4dd','#c5d4dd',
+        ['#000000','#83afe5','#7fc1ca','#a8ce93','#83afe5','#9a93e1','#f2c38f','#c5d4dd',
+         '#595d67','#83afe5','#7fc1ca','#a8ce93','#83afe5','#9a93e1','#f2c38f','#c5d4dd']],
+      ['obsidian','Obsidian','#283033','#cdcdcd','#cdcdcd',
+        ['#000000','#a60001','#00bb00','#fecd22','#3a9bdb','#bb00bb','#00bbbb','#bbbbbb',
+         '#555555','#ff0003','#93c863','#fef874','#a1d7ff','#ff55ff','#55ffff','#ffffff']],
+      ['onehalfdark','OneHalf Dark','#282c34','#dcdfe4','#dcdfe4',
+        ['#282c34','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#dcdfe4',
+         '#5c6370','#e06c75','#98c379','#e5c07b','#61afef','#c678dd','#56b6c2','#ffffff']],
+      ['onehalflight','OneHalf Light','#fafafa','#383a42','#383a42',
+        ['#383a42','#e45649','#50a14f','#c18401','#0184bc','#a626a4','#0997b3','#4f525e',
+         '#696c77','#e45649','#50a14f','#c18401','#0184bc','#a626a4','#0997b3','#ffffff']],
+      ['parasio-dark','Paraiso Dark','#2f1e2e','#a39e9b','#a39e9b',
+        ['#2f1e2e','#ef6155','#48b685','#fec418','#06b6ef','#815ba4','#5bc4bf','#a39e9b',
+         '#776e71','#ef6155','#48b685','#fec418','#06b6ef','#815ba4','#5bc4bf','#e7e9db']],
+      ['pinky','Pinky','#0e0e0e','#e0e0e0','#e0e0e0',
+        ['#0e0e0e','#ff5d5d','#5dff8e','#ffe16a','#5da6ff','#d65dff','#5dffee','#e0e0e0',
+         '#4d4d4d','#ff8080','#80ffab','#ffe88d','#80baff','#e88dff','#8dfff5','#ffffff']],
+      ['powershell','PowerShell','#012456','#eeedf0','#eeedf0',
+        ['#000000','#e50000','#00a600','#e5e500','#0000ff','#e500e5','#00e5e5','#e5e5e5',
+         '#666666','#ff5c5c','#5cff5c','#ffff5c','#5c5cff','#ff5cff','#5cffff','#ffffff']],
+      ['purple-rain','Purple Rain','#21084a','#ffe0ff','#ffe0ff',
+        ['#21084a','#ff2666','#aaff66','#ffe84d','#00aaff','#d86cff','#66ffe8','#f2f2f2',
+         '#4d2080','#ff5c8a','#c2ff8a','#fff280','#4dc4ff','#e690ff','#8affee','#ffffff']],
+      ['razzle-dazzle','Razzle Dazzle','#221d1f','#f8f8f8','#f8f8f8',
+        ['#221d1f','#e01d30','#14b811','#f5cc14','#1a80ee','#d21fd1','#14b6b6','#f8f8f8',
+         '#4d3d41','#ff4b5c','#4ddb4d','#ffe64d','#4d9cff','#e64dff','#4ddbdb','#ffffff']],
+      ['relaxed','Relaxed','#353a44','#d9d9d9','#d9d9d9',
+        ['#151515','#bc5653','#909d63','#ebc17a','#6a8799','#b06698','#c9dfff','#d9d9d9',
+         '#636363','#bc5653','#a0ac77','#ebc17a','#7eaac7','#b06698','#acbbd0','#f7f7f7']],
+      ['royal','Royal','#100815','#514968','#514968',
+        ['#241f2b','#91284c','#23801c','#b49d27','#6580b0','#674d96','#8aaabe','#524966',
+         '#312d3d','#d5356c','#2cd946','#fde83b','#90baf9','#a479e3','#acd4eb','#9e8cbd']],
+      ['rustic','Rustic','#121212','#ededed','#ededed',
+        ['#121212','#a34a3c','#71964a','#f0c674','#5d8aa8','#a4799d','#4a8d96','#ededed',
+         '#4d4d4d','#cf5b4a','#8db35c','#ffd98a','#77a5c2','#c48fbc','#5cafb8','#ffffff']],
+      ['sandcastle','Sandcastle','#141414','#c5c5c5','#c5c5c5',
+        ['#141414','#a83a3a','#4f8a40','#a8913a','#3f7fa8','#8a4fa8','#3f8a8a','#c5c5c5',
+         '#4d4d4d','#c45c5c','#6ba85a','#c4b25c','#5a9cc4','#a86ac4','#5aacac','#ffffff']],
+      ['seafoam-pastel','Seafoam Pastel','#243435','#d4e7d4','#d4e7d4',
+        ['#757575','#825d4d','#728c62','#ada16d','#4d7b82','#8a7267','#729494','#e0e0e0',
+         '#8a8a8a','#cf937a','#98d9aa','#fae79d','#7ac3cf','#d6b2a1','#ade0e0','#e0e0e0']],
+      ['sea-shell','Sea Shell','#09141b','#deb88d','#deb88d',
+        ['#17384c','#d15123','#027c9b','#fca02f','#1e4950','#68d4f1','#50a3b5','#deb88d',
+         '#434b53','#d48678','#628d98','#fdd39f','#1bbcdd','#bbe3ee','#87acb4','#fee4ce']],
+      ['seoul256','Seoul256','#3a3a3a','#d0d0d0','#d0d0d0',
+        ['#3a3a3a','#d66666','#7ca37c','#e2c17a','#7ca0c0','#b377b3','#78b9bb','#d0d0d0',
+         '#5f5f5f','#e08f8f','#98b898','#f0d5a0','#98b8d8','#cfa5cf','#98d5d5','#ffffff']],
+      ['slate','Slate','#222222','#35b1d2','#35b1d2',
+        ['#222222','#e2a8bf','#81d778','#c4c9c0','#264b49','#a481d3','#15ab9c','#02c5e0',
+         '#ffffff','#ffcdd9','#beffa8','#d0ccca','#7ab0d2','#c5a7d9','#8cdfe0','#e0e0e0']],
+      ['soft-server','Soft Server','#121212','#99a3a2','#99a3a2',
+        ['#1c1c1c','#a2686a','#6a9a64','#c1a76c','#6a8e9c','#9c6a9c','#6a9a9a','#99a3a2',
+         '#4d4d4d','#c98a8c','#8ab884','#e0c48a','#8aacbc','#bc8abc','#8ab8b8','#ffffff']],
+      ['spring','Spring','#0a1e24','#ecf0c1','#ecf0c1',
+        ['#000000','#ff4d83','#1f8c3b','#fee07f','#1fc95b','#b4377a','#2e9a9a','#ecf0c1',
+         '#2e2e2e','#ff6b9a','#4da85c','#fef2a0','#4dd47a','#d65b9a','#5ab8b8','#ffffff']],
+      ['squirrel','Squirrel','#121212','#c5c5c5','#c5c5c5',
+        ['#1c1c1c','#b76f5a','#5c905c','#c2a567','#6a9cbf','#a979b3','#5c9c9c','#c5c5c5',
+         '#4d4d4d','#d68f7a','#7cb87c','#dfc487','#8db8d3','#c79ccf','#7cb8b8','#ffffff']],
+      ['teerb','Teerb','#262626','#d0d0d0','#d0d0d0',
+        ['#1c1c1c','#d68686','#aed686','#d7af87','#86aed6','#d6aed6','#8adbb4','#d0d0d0',
+         '#4d4d4d','#e8a2a2','#c4e2a2','#ebc6a2','#a2c4e2','#e2a2e2','#a2e2c4','#ffffff']],
+      ['terafox','Terafox','#152528','#e6eaea','#e6eaea',
+        ['#2f3239','#e85c51','#7aa4a1','#fda47f','#5a93aa','#ad5c7c','#a1cdd8','#ebebeb',
+         '#4e5157','#eb746b','#8eb2af','#fdb292','#73a3b7','#b97490','#afd4de','#ffffff']],
+      ['the-hulk','The Hulk','#1b1d1e','#b5b5b5','#b5b5b5',
+        ['#1b1d1e','#269d1b','#13ce30','#63e457','#2525f5','#641f74','#378ca9','#d9d8d1',
+         '#505354','#8dff2a','#48ff77','#3afe16','#506b95','#72589d','#4085a6','#e9e9e9']],
+      ['thayer-bright','Thayer Bright','#1b1d1e','#f8f8f8','#f8f8f8',
+        ['#1b1d1e','#f92672','#4df840','#f4fd22','#2757d6','#8c54fe','#38c8b5','#ccccc6',
+         '#505354','#ff5995','#b6e354','#feed6c','#3f78ff','#9e6ffe','#23cfd5','#f8f8f2']],
+      ['toy-chest','Toy Chest','#24364b','#31d07b','#31d07b',
+        ['#2c3f58','#be2d26','#1a9172','#db8e27','#325d96','#8a5edc','#35a08f','#23d183',
+         '#336889','#dd5944','#31d07b','#e7d84b','#34a6da','#ae6bdc','#42c3ae','#d5d5d5']],
+      ['treehouse','Treehouse','#191919','#786b53','#786b53',
+        ['#321300','#b2270e','#44a900','#aa820c','#58859a','#97363d','#b25a1e','#786b53',
+         '#504433','#ed5d20','#55f238','#f2b732','#85cfed','#e14c5a','#f07c14','#fac800']],
+      ['ubuntu','Ubuntu','#300a24','#ffffff','#ffffff',
+        ['#2e3436','#cc0000','#4e9a06','#c4a000','#3465a4','#75507b','#06989a','#d3d7cf',
+         '#555753','#ef2929','#8ae234','#fce94f','#729fcf','#ad7fa8','#34e2e2','#eeeeec']],
+      ['under-the-sea','Under The Sea','#011116','#ffffff','#ffffff',
+        ['#022026','#b2302d','#00a941','#59819c','#459a86','#00599d','#5d7e19','#405555',
+         '#384451','#ff4242','#2aea5e','#8ed4fd','#61d5ba','#1298ff','#98d028','#58fbd6']],
+      ['warm-neon','Warm Neon','#2b2325','#f0e0d6','#f0e0d6',
+        ['#2b2325','#e24346','#6ba731','#f5cb4a','#4261c1','#a0469b','#4c9c9e','#e0cfc2',
+         '#4d3d42','#f26d6b','#88c84a','#ffd962','#5d7fe0','#c45ab8','#63b8ba','#ffffff']],
+      ['wild-cherry','Wild Cherry','#1f1726','#dafaff','#dd00ff',
+        ['#000507','#d94085','#2ab250','#ffd16f','#883cdc','#ececec','#c1b8d8','#fff8de',
+         '#009cc9','#da6bac','#f4dca5','#eac066','#308cba','#ae636b','#ff919d','#ff8c8c']],
+      ['wryan','Wryan','#101010','#999993','#999993',
+        ['#3d3d3d','#8c4665','#287373','#7c7c99','#395573','#5e468c','#31658c','#899ca1',
+         '#3d3d3d','#bf4d80','#53a6a6','#9e9ecb','#477ab3','#7e62b3','#6096bf','#c0c0c0']],
+      ['zeus','Zeus','#1c1c1c','#dcdccc','#dcdccc',
+        ['#1c1c1c','#b86161','#5f9f5f','#c1b05a','#5a8ab0','#a35a9f','#5a9f9f','#dcdccc',
+         '#4d4d4d','#d97c7c','#7cb87c','#dbca6d','#7ca9d0','#c17cbd','#7cc0c0','#ffffff']]
+    ];
+    P.forEach((a) => { if (!SCHEMES[a[0]]) SCHEMES[a[0]] = mkScheme(a[1],a[2],a[3],a[4],a[5]); });
+  })();
 
   const SCHEME_NAMES = Object.keys(SCHEMES);
 
@@ -1150,8 +1580,6 @@
 
   /* ------------------------------------------------------------
      5. FREE PROXY POOL
-     Categorized: proxies that support POST (used for streaming)
-     and GET-only proxies (used for plain-text fallback).
      ------------------------------------------------------------ */
   const PROXIES_POST = [
     { label:'corsproxy.io', url:(u) => 'https://corsproxy.io/?' + encodeURIComponent(u) },
@@ -1169,21 +1597,29 @@
     { label:'cors.sh',        url:(u) => 'https://proxy.cors.sh/' + u }
   ];
 
-  /* Kept for legacy reference / proxy command listing */
-  const PROXY_LABELS = [
-    'allorigins.win','corsproxy.io','codetabs.com','thingproxy','r.jina.ai','cors.sh'
+  /* ------------------------------------------------------------
+     6. LIVE LLM ENDPOINTS — Pollinations.ai
+     ------------------------------------------------------------ */
+  const HEX_AI_BASE           = 'https://gen.pollinations.ai';
+  const HEX_AI_ENDPOINT       = HEX_AI_BASE + '/v1/chat/completions';
+  const HEX_AI_MODELS_URL     = HEX_AI_BASE + '/v1/models';
+  const HEX_AI_LEGACY_ENDPOINT= 'https://text.pollinations.ai/openai';
+  const HEX_AI_LEGACY_GET_BASE= 'https://text.pollinations.ai/';
+  const HEX_AI_REFERRER       = 'hexai-termux-web';
+  const HEX_AI_KEY_STORAGE    = 'hexai.apikey';
+  const HEX_AI_MODEL_STORAGE  = 'hexai.model';
+
+  const HEX_AI_DEFAULT_MODEL  = 'openai/gpt-5.4-nano';
+  const HEX_AI_MODELS_HINT    = [
+    'openai/gpt-5.4-nano',
+    'openai/gpt-5.4-mini',
+    'openai/gpt-4o-mini',
+    'openai',
+    'mistral',
+    'llama'
   ];
 
-  /* ------------------------------------------------------------
-     6. LIVE LLM ENDPOINT — Pollinations.ai text API (FREE, no key)
-        POST:  https://text.pollinations.ai/openai    (OpenAI-compatible, SSE stream)
-        GET :  https://text.pollinations.ai/<prompt>   (plain text)
-     ------------------------------------------------------------ */
-  const HEX_AI_ENDPOINT = 'https://text.pollinations.ai/openai';
-  const HEX_AI_GET_BASE = 'https://text.pollinations.ai/';
-  const HEX_AI_MODEL    = 'openai';
-  const HEX_AI_REFERRER = 'hexai-termux-web';
-  const HEX_AI_SYSTEM   = (
+  const HEX_AI_SYSTEM = (
     'You are HEX AI, a helpful, friendly and concise assistant embedded inside ' +
     'a Termux-style web terminal called HEX AI (built on xterm.js). ' +
     'Reply in plain text only — never use markdown code fences, tables or headings. ' +
@@ -1205,27 +1641,61 @@
   }
 
   /* ------------------------------------------------------------
-     7. VIRTUAL FILESYSTEM
+     7. API KEY + MODEL MANAGEMENT
+     ------------------------------------------------------------ */
+  function loadApiKey() {
+    try { return localStorage.getItem(HEX_AI_KEY_STORAGE) || null; }
+    catch (e) { return null; }
+  }
+  function saveApiKey(k) {
+    try {
+      if (k) localStorage.setItem(HEX_AI_KEY_STORAGE, k);
+      else   localStorage.removeItem(HEX_AI_KEY_STORAGE);
+    } catch (e) {}
+    state.apiKey = k || null;
+  }
+  function loadModel() {
+    try { return localStorage.getItem(HEX_AI_MODEL_STORAGE) || null; }
+    catch (e) { return null; }
+  }
+  function saveModel(m) {
+    try {
+      if (m) localStorage.setItem(HEX_AI_MODEL_STORAGE, m);
+      else   localStorage.removeItem(HEX_AI_MODEL_STORAGE);
+    } catch (e) {}
+    state.model = m || HEX_AI_DEFAULT_MODEL;
+  }
+  function maskKey(k) {
+    if (!k) return '(not set)';
+    if (k.length < 12) return k.slice(0, 2) + '…' + k.slice(-2);
+    return k.slice(0, 6) + '…' + k.slice(-4);
+  }
+  function keyLooksValid(k) {
+    return /^[sp]k_/.test(k) && k.length >= 12;
+  }
+
+  /* ------------------------------------------------------------
+     8. VIRTUAL FILESYSTEM
      ------------------------------------------------------------ */
   const FS = {
     '~': ['readme.txt', 'hexai.conf', 'packages.list', 'colors', 'fonts'],
     '~/readme.txt':
-      'HEX AI Web Terminal v3.4\n' +
+      'HEX AI Web Terminal v3.6\n' +
       '=========================\n' +
       'Termux Android–authentic mobile interface.\n' +
       '\n' +
-      'NEW in v3.4:\n' +
-      '  • Auto theme detection (follows device preference)\n' +
-      '  • Forced dark / light toggle\n' +
-      '  • Termux session drawer + three-dot menu\n' +
-      '  • Long-press context menu (Copy / Paste / Style)\n' +
+      'NEW in v3.6:\n' +
+      '  • Faithful port of adi1090x/termux-style\n' +
+      '  • 89 color-schemes · 20 powerline-ready fonts\n' +
+      '  • ./install · ./uninstall · reload_settings()\n' +
+      '  • L / I import (Local File · Internet URL)\n' +
+      '  • .current_color / .current_font tracking\n' +
       '\n' +
-      'Kept from v3.3:\n' +
-      '  • Live AI via Pollinations text API (no API key)\n' +
-      '  • Streaming token-by-token AI replies\n' +
-      '  • termux-api bridge + termux-style port\n' +
+      'Kept from v3.5:\n' +
+      '  • Live AI via gen.pollinations.ai (API key management)\n' +
+      '  • Auto theme · forced dark/light · session drawer\n' +
       '\n' +
-      'Commands: help · ai <question> · theme auto|dark|light\n',
+      'Commands: help · ai <question> · termux-style · ./install · theme auto|dark|light\n',
     '~/hexai.conf':
       '# HEX AI terminal configuration\n' +
       'user=hexai\n' +
@@ -1233,9 +1703,15 @@
       'theme=auto\n' +
       'scheme=hex\n' +
       'font=jetbrains\n' +
+      'llm_base=' + HEX_AI_BASE + '\n' +
       'llm_endpoint=' + HEX_AI_ENDPOINT + '\n' +
-      'llm_get_base=' + HEX_AI_GET_BASE + '\n' +
-      'llm_model=' + HEX_AI_MODEL + '\n',
+      'llm_models=' + HEX_AI_MODELS_URL + '\n' +
+      'llm_model=' + HEX_AI_DEFAULT_MODEL + '\n' +
+      'llm_auth=bearer-or-query-param\n' +
+      'llm_keys_url=https://enter.pollinations.ai\n' +
+      'llm_legacy_endpoint=' + HEX_AI_LEGACY_ENDPOINT + '\n' +
+      'colors_total=' + SCHEME_NAMES.length + '\n' +
+      'fonts_total=' + FONTS.length + '\n',
     '~/packages.list':
       'python 28.4MB\nfiglet 1.2MB\ncowsay 0.3MB\nfortune 2.1MB\n' +
       'htop 1.8MB\nnmap 6.5MB\ngit 12.0MB\nlolcat 0.4MB\nsl 0.2MB\nneofetch 0.9MB\n' +
@@ -1246,7 +1722,7 @@
   };
 
   /* ------------------------------------------------------------
-     8. PACKAGES
+     9. PACKAGES
      ------------------------------------------------------------ */
   const PACKAGES = {
     python  : { size:'28.4 MB', desc:'Python 3.12 interpreter + REPL',  cmd:'python'   },
@@ -1268,7 +1744,7 @@
   };
 
   /* ------------------------------------------------------------
-     9. STATE
+     10. STATE
      ------------------------------------------------------------ */
   const state = {
     user      : 'hexai',
@@ -1285,7 +1761,15 @@
     font      : 'jetbrains',
     closed    : false,
     menuActive: null,
-    aiLive    : true
+    aiLive    : true,
+    apiKey    : null,
+    model     : HEX_AI_DEFAULT_MODEL,
+    _keyWarned: false,
+    _lastVia  : '',
+    /* termux-style state (mirrors ~/.termux/.current_color & .current_font) */
+    currentColor: null,
+    currentFont : null,
+    tstyleInstalled: false
   };
 
   let lineBuf = '';
@@ -1294,7 +1778,7 @@
   let altArmed  = false;
 
   /* ------------------------------------------------------------
-     10. TOASTS / NOTIFICATIONS
+     11. TOASTS / NOTIFICATIONS
      ------------------------------------------------------------ */
   function showToast(text, kind) {
     if (!toastsEl) return;
@@ -1317,7 +1801,7 @@
   }
 
   /* ------------------------------------------------------------
-     11. XTERM INSTANCE
+     12. XTERM INSTANCE
      ------------------------------------------------------------ */
   const term = new Terminal({
     cursorBlink      : true,
@@ -1344,7 +1828,7 @@
   term.open(termEl);
 
   /* ------------------------------------------------------------
-     12. TERMINAL COLOR SYNC WITH THEME
+     13. TERMINAL COLOR SYNC WITH THEME
      ------------------------------------------------------------ */
   function applyEffectiveScheme(eff) {
     if (state.schemeLock) return;
@@ -1366,7 +1850,7 @@
   });
 
   /* ------------------------------------------------------------
-     13. OUTPUT HELPERS
+     14. OUTPUT HELPERS
      ------------------------------------------------------------ */
   const ANSI = {
     r  : '\x1b[0m', b: '\x1b[1m', d: '\x1b[2m',
@@ -1383,16 +1867,6 @@
 
   function write(s) { term.write(s); }
   function println(s) { term.write((s === undefined ? '' : s) + '\r\n'); }
-
-  function startSpinner(label) {
-    const frames = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
-    let i = 0;
-    const id = setInterval(() => {
-      term.write('\x1b[2K\r' + C.cyn + frames[i++ % frames.length] + C.r +
-                 ' ' + C.gry + (label || 'working') + C.r);
-    }, 72);
-    return { stop() { clearInterval(id); term.write('\x1b[2K\r'); } };
-  }
 
   async function typeOut(text, delay) {
     const d = (typeof delay === 'number') ? delay : 6;
@@ -1418,7 +1892,7 @@
   }
 
   /* ------------------------------------------------------------
-     14. GENERIC PROXY GET (kept for fetch command)
+     15. GENERIC PROXY GET
      ------------------------------------------------------------ */
   async function proxyFetch(url) {
     const total = PROXIES_GET.length;
@@ -1442,10 +1916,8 @@
   }
 
   /* ------------------------------------------------------------
-     15. LIVE LLM STREAMING  (FIXED for Pollinations.ai)
+     16. LIVE LLM STREAMING
      ------------------------------------------------------------ */
-
-  /* --- helpers for parsing OpenAI / SSE payloads --- */
   function extractDeltaFromObj(obj) {
     if (!obj) return '';
     const ch = obj.choices && obj.choices[0];
@@ -1476,7 +1948,6 @@
   }
 
   function parseSseBuffer(buf) {
-    /* returns { text, done, leftover } */
     let text = '';
     let done = false;
     let idx;
@@ -1492,7 +1963,6 @@
           text += extractDeltaFromObj(obj);
         } catch (e) {}
       } else {
-        /* Some servers send raw JSON lines */
         try {
           const obj = JSON.parse(line);
           text += extractDeltaFromObj(obj);
@@ -1502,26 +1972,28 @@
     return { text, done, leftover: buf };
   }
 
-  /* --- Attempt a POST streaming request --- */
-  async function tryPostStream(url, body, onToken, onStart, label) {
+  async function tryPostStream(url, body, onToken, onStart, label, extraHeaders) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 25000);
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        signal: controller.signal,
-        headers: {
+      const headers = Object.assign(
+        {
           'Content-Type': 'application/json',
           'Accept': 'text/event-stream, application/json'
         },
+        extraHeaders || {}
+      );
+      const res = await fetch(url, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: headers,
         body: JSON.stringify(body)
       });
       clearTimeout(timer);
-      if (!res.ok) return { ok:false, aborted:false };
+      if (!res.ok) return { ok:false, aborted:false, status: res.status };
 
       const ctype = (res.headers.get('content-type') || '').toLowerCase();
 
-      /* --- Non-streaming JSON response --- */
       if (ctype.indexOf('application/json') !== -1 && !res.body) {
         const data = await res.json();
         const text = extractFullFromObj(data);
@@ -1531,10 +2003,8 @@
         return { ok:true, text, via:label };
       }
 
-      /* --- Fallback when ReadableStream isn't available --- */
       if (!res.body || typeof res.body.getReader !== 'function') {
         const raw = await res.text();
-        /* try JSON */
         let text = '';
         try { text = extractFullFromObj(JSON.parse(raw)); } catch (e) {}
         if (!text) {
@@ -1548,7 +2018,6 @@
         return { ok:true, text, via:label };
       }
 
-      /* --- Streaming with ReadableStream --- */
       if (onStart) onStart(label);
 
       const reader  = res.body.getReader();
@@ -1563,7 +2032,6 @@
         if (done) break;
         buffer += decoder.decode(value, { stream:true });
 
-        /* If it's not SSE, treat the whole buffer as text later */
         if (buffer.indexOf('data:') === 0 || buffer.indexOf('data: ') !== -1) sawSse = true;
 
         if (sawSse) {
@@ -1572,12 +2040,9 @@
           if (parsed.text) { full += parsed.text; if (onToken) onToken(parsed.text); }
           if (parsed.done) { try { reader.cancel(); } catch (e) {} break; }
         } else {
-          /* Plain text stream — just accumulate */
-          /* But if it looks like JSON, try once we've got something */
           if (buffer.length > 32 && (buffer.trim()[0] === '{' || buffer.trim()[0] === '[')) {
-            /* leave in buffer, wait for done */
+            /* wait for done */
           } else {
-            /* flush as plain text */
             full += buffer;
             if (onToken) onToken(buffer);
             buffer = '';
@@ -1585,7 +2050,6 @@
         }
       }
 
-      /* final flush */
       if (buffer.trim()) {
         if (sawSse) {
           const parsed = parseSseBuffer(buffer + '\n');
@@ -1606,11 +2070,10 @@
       return { ok:false };
     } catch (err) {
       clearTimeout(timer);
-      return { ok:false, aborted: state.interrupt };
+      return { ok:false, aborted: state.interrupt, error: err && err.message };
     }
   }
 
-  /* --- Attempt a GET plain-text request --- */
   async function tryGetText(url, onToken, onStart, label) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 25000);
@@ -1622,7 +2085,6 @@
       let text = await res.text();
       if (!text) return { ok:false };
 
-      /* Unwrap if the response is JSON */
       const trimmed = text.trim();
       if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') {
         try {
@@ -1636,7 +2098,6 @@
 
       if (onStart) onStart(label);
 
-      /* Simulate streaming for smooth UX */
       const chunks = text.match(/[\s\S]{1,4}/g) || [text];
       for (let i = 0; i < chunks.length; i++) {
         if (state.interrupt) break;
@@ -1651,34 +2112,59 @@
     }
   }
 
-  /* --- Main entry point: try POST streaming → GET fallback --- */
   async function streamHexAIReply(userText, onToken, onStart) {
     if (!state.aiLive) return { ok:false, error:'offline mode' };
 
-    /* --- Phase 1: POST /openai (streaming) --- */
-    const postBody = {
-      model: HEX_AI_MODEL,
+    /* Phase A: gen.pollinations.ai (requires API key) */
+    if (state.apiKey) {
+      const authedEndpoint = HEX_AI_ENDPOINT + '?key=' + encodeURIComponent(state.apiKey);
+      const body = {
+        model: state.model || HEX_AI_DEFAULT_MODEL,
+        messages: conversation.slice(),
+        stream: true,
+        temperature: 0.7,
+        referrer: HEX_AI_REFERRER
+      };
+      const headers = { 'Authorization': 'Bearer ' + state.apiKey };
+
+      const targets = [
+        { label:'gen.pollinations.ai', url: authedEndpoint }
+      ].concat(
+        PROXIES_POST.map((p) => ({ label: p.label + '·gen', url: p.url(authedEndpoint) }))
+      );
+
+      for (const t of targets) {
+        if (state.interrupt) return { ok:false, error:'aborted' };
+        const r = await tryPostStream(t.url, body, onToken, onStart, t.label, headers);
+        if (r.ok) { state._lastVia = t.label; return r; }
+        if (r.aborted) return r;
+      }
+    }
+
+    /* Phase B: legacy text.pollinations.ai POST */
+    const legacyBody = {
+      model: 'openai',
       messages: conversation.slice(),
       stream: true,
       temperature: 0.7,
-      private: true,
-      referrer: HEX_AI_REFERRER
+      referrer: HEX_AI_REFERRER,
+      private: true
     };
 
-    const postTargets = [
-      { label:'pollinations-direct', url: HEX_AI_ENDPOINT }
+    const legacyTargets = [
+      { label:'legacy-direct', url: HEX_AI_LEGACY_ENDPOINT }
     ].concat(
-      PROXIES_POST.map((p) => ({ label: p.label, url: p.url(HEX_AI_ENDPOINT) }))
+      PROXIES_POST.map((p) => ({ label: p.label + '·legacy', url: p.url(HEX_AI_LEGACY_ENDPOINT) }))
     );
 
-    for (const t of postTargets) {
+    for (const t of legacyTargets) {
       if (state.interrupt) return { ok:false, error:'aborted' };
-      const r = await tryPostStream(t.url, postBody, onToken, onStart, t.label);
-      if (r.ok) return r;
+      const r = await tryPostStream(t.url, legacyBody, onToken, onStart, t.label, null);
+      if (r.ok) { state._lastVia = t.label; return r; }
       if (r.aborted) return r;
     }
 
-    /* --- Phase 2: GET plain-text fallback (very reliable) --- */
+    /* Phase C: legacy GET plain-text fallback */
     const promptLines = ['System: ' + HEX_AI_SYSTEM];
     for (let i = 1; i < conversation.length; i++) {
       const m = conversation[i];
@@ -1687,22 +2173,19 @@
     promptLines.push('Assistant:');
     const prompt = promptLines.join('\n');
 
-    /* Pollinations GET accepts the prompt URL-encoded in the path,
-       with model & referrer as query params. */
-    const qs = '?model=' + encodeURIComponent(HEX_AI_MODEL) +
-               '&referrer=' + encodeURIComponent(HEX_AI_REFERRER);
-    const rawGetUrl = HEX_AI_GET_BASE + encodeURIComponent(prompt) + qs;
+    const qs = '?model=openai&referrer=' + encodeURIComponent(HEX_AI_REFERRER);
+    const rawGetUrl = HEX_AI_LEGACY_GET_BASE + encodeURIComponent(prompt) + qs;
 
     const getTargets = [
-      { label:'pollinations-get', url: rawGetUrl }
+      { label:'legacy-get', url: rawGetUrl }
     ].concat(
-      PROXIES_GET.map((p) => ({ label: p.label, url: p.url(rawGetUrl) }))
+      PROXIES_GET.map((p) => ({ label: p.label + '·get', url: p.url(rawGetUrl) }))
     );
 
     for (const t of getTargets) {
       if (state.interrupt) return { ok:false, error:'aborted' };
       const r = await tryGetText(t.url, onToken, onStart, t.label);
-      if (r.ok) return r;
+      if (r.ok) { state._lastVia = t.label; return r; }
       if (r.aborted) return r;
     }
 
@@ -1710,7 +2193,7 @@
   }
 
   /* ------------------------------------------------------------
-     16. PROMPT + LINE EDITOR
+     17. PROMPT + LINE EDITOR
      ------------------------------------------------------------ */
   function promptStr() {
     return C.grn + C.b + state.user + C.r +
@@ -1762,7 +2245,6 @@
     cursor = lineBuf.length; redraw();
   }
   function autoComplete() {
-    /* tiny completion: expand known commands from the current word */
     const before = lineBuf.slice(0, cursor);
     const m = before.match(/(\S+)$/);
     if (!m) return;
@@ -1785,7 +2267,7 @@
   }
 
   /* ------------------------------------------------------------
-     17. INPUT HANDLING
+     18. INPUT HANDLING
      ------------------------------------------------------------ */
   function handleInput(data) {
     if (state.menuActive) {
@@ -1846,7 +2328,7 @@
   });
 
   /* ------------------------------------------------------------
-     18. COMMAND SUBMITTER
+     19. COMMAND SUBMITTER
      ------------------------------------------------------------ */
   async function submit() {
     const raw = lineBuf;
@@ -1874,7 +2356,7 @@
   }
 
   /* ------------------------------------------------------------
-     19. TOKENIZER
+     20. TOKENIZER
      ------------------------------------------------------------ */
   function tokenize(str) {
     const out = [];
@@ -1892,7 +2374,7 @@
   }
 
   /* ============================================================
-     20. THEME COMMAND
+     21. THEME COMMAND
      ============================================================ */
   async function cmdTheme(args) {
     const sub = (args[0] || '').toLowerCase();
@@ -1934,7 +2416,7 @@
   }
 
   /* ============================================================
-     21. TERMUX:API COMMANDS
+     22. TERMUX:API COMMANDS
      ============================================================ */
   async function cmdTermuxApi(args) {
     const sub = args[0] || 'help';
@@ -2250,24 +2732,467 @@
   }
 
   /* ============================================================
-     22. TERMUX-STYLE
+     23. TERMUX-STYLE — FAITHFUL PORT (adi1090x/termux-style)
      ============================================================ */
+
+  /* --- .current_color / .current_font tracking (mirrors ~/.termux) --- */
+  function loadCurrentColor() {
+    try { return localStorage.getItem('hexai.current_color') || null; } catch (e) { return null; }
+  }
+  function saveCurrentColor(v) {
+    try { if (v) localStorage.setItem('hexai.current_color', v); else localStorage.removeItem('hexai.current_color'); } catch (e) {}
+    state.currentColor = v;
+  }
+  function loadCurrentFont() {
+    try { return localStorage.getItem('hexai.current_font') || null; } catch (e) { return null; }
+  }
+  function saveCurrentFont(v) {
+    try { if (v) localStorage.setItem('hexai.current_font', v); else localStorage.removeItem('hexai.current_font'); } catch (e) {}
+    state.currentFont = v;
+  }
+
+  /* --- reload_settings() — simulation of: am broadcast ... com.termux --- */
+  async function reloadSettings() {
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.mag + 'Reloading Settings...' + C.r);
+    try {
+      /* Real Termux broadcast is Android-only; here we just re-apply the theme */
+      const currentScheme = state.currentColor
+        ? state.currentColor.replace(/\.properties$/,'')
+        : state.scheme;
+      const currentFontId = state.currentFont
+        ? state.currentFont.replace(/\.ttf$/,'')
+        : state.font;
+      if (SCHEMES[currentScheme]) {
+        state.scheme = currentScheme;
+        state.schemeLock = true;
+        term.options.theme = SCHEMES[currentScheme].theme;
+        ROOT.style.background = SCHEMES[currentScheme].theme.background;
+      }
+      const f = FONTS.find((x) => x.id === currentFontId);
+      if (f) {
+        state.font = currentFontId;
+        term.options.fontFamily = f.css + ', monospace';
+      }
+      setTimeout(fitNow, 60);
+    } catch (e) {}
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Applied Successfully.' + C.r + '\n');
+  }
+
+  /* --- Bash-faithful banner (matches adi1090x/termux-style) --- */
+  function styleBanner() {
+    const B = C.blu, R = C.red, O = C.yel, G = C.grn;
+    println('    ' + B + '┌──────────────────────────────────────────────────┐' + C.r);
+    println('    ' + B + '│' + R + '░▀█▀░█▀▀░█▀▄░█▄█░█░█░█░█' + O + '░░░░░' + G + '█▀▀░▀█▀░█░█░█░░░█▀▀░░' + B + '│' + C.r);
+    println('    ' + B + '│' + R + '░░█░░█▀▀░█▀▄░█░█░█░█░▄▀▄' + O + '░▄▄▄' + R + '░' + G + '▀▀█░░█░░░█░░█░░░█▀▀░░' + B + '│' + C.r);
+    println('    ' + B + '│' + R + '░░▀░░▀▀▀░▀░▀░▀░▀░▀▀▀░▀░▀' + O + '░░░░░' + G + '▀▀▀░░▀░░░▀░░▀▀▀░▀▀▀░░' + B + '│' + C.r);
+    println('    ' + B + '└──────────────────────────────────────────────────┘' + C.r);
+    println('    ' + B + '[' + R + '*' + B + '] ' + O + 'By- Aditya Shakya ' + R + '//' + O + ' adi1090x' + C.r);
+  }
+
+  /* --- check_files(): total_colors / total_fonts --- */
+  function checkFiles() {
+    return {
+      total_colors: SCHEME_NAMES.length,
+      total_fonts: FONTS.length
+    };
+  }
+
+  /* --- ./install script (faithful port of install_tstyle) --- */
+  async function cmdStyleInstall() {
+    println('');
+    styleBanner();
+    println('');
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Installing Dependencies...' + C.cyn);
+    println('');
+    await sleep(300);
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Dependencies are already Installed!' + C.r);
+    await sleep(220);
+
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Installing termux-style...' + C.r);
+    await sleep(220);
+
+    /* Delete old files from previous installation */
+    if (state.tstyleInstalled) {
+      println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.red + 'Deleting files from previous installation...' + C.blu + C.r);
+      await progressBar('cleanup');
+    }
+
+    /* Simulate copying files */
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Coping files in ' + C.grn + '$PREFIX/share ' + C.yel + 'directory...' + C.blu + C.r);
+    await progressBar('colors');
+    await progressBar('fonts');
+    await progressBar('tstyle');
+
+    await sleep(180);
+    state.tstyleInstalled = true;
+
+    /* Pre-set current color / font if not already set */
+    if (!state.currentColor) saveCurrentColor('hex.properties');
+    if (!state.currentFont)  saveCurrentFont('jetbrains.ttf');
+
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Successfully Installed.' + C.r);
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Now You Can Run This Program By Just typing ' + C.mag + 'termux-style' + C.grn + '.' + C.r);
+    println('');
+    showToast('✔ termux-style installed', 'ok');
+  }
+
+  /* --- ./uninstall script --- */
+  async function cmdStyleUninstall() {
+    println('');
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Uninstalling termux-style...' + C.r);
+    await sleep(250);
+    await progressBar('removing symlink');
+    await progressBar('removing colors');
+    await progressBar('removing fonts');
+    await progressBar('removing tstyle');
+    state.tstyleInstalled = false;
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Successfully Uninstalled.' + C.r);
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Thanks for using ' + C.mag + 'termux-style' + C.grn + '.' + C.r);
+    println('');
+    showToast('✔ termux-style uninstalled', 'ok');
+  }
+
+  /* --- apply_colors(): bash-faithful color selection --- */
+  async function applyColors() {
+    println('');
+    let count = 1;
+    SCHEME_NAMES.forEach((id) => {
+      const active = state.currentColor && state.currentColor.replace(/\.properties$/,'') === id;
+      const name = SCHEMES[id].name;
+      const line = '    ' + (active ? C.grn + '▸' : ' ') + C.yel + '[' + count + '] ' + C.wht + name +
+                   (active ? C.gry + '  (active)' + C.r : C.r);
+      println(line);
+      count++;
+    });
+    println('');
+    term.write('    ' + C.blu + '[' + C.red + 'Select Color Scheme (1 to ' + SCHEME_NAMES.length + ')' + C.blu + ']: ' + C.grn);
+    const answer = await readLine();
+    println('');
+
+    const idx = parseInt(answer, 10) - 1;
+    if (!isNaN(idx) && idx >= 0 && idx < SCHEME_NAMES.length) {
+      const scheme = SCHEME_NAMES[idx];
+      println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Applying Color Scheme...' + C.r);
+      await sleep(180);
+      /* Apply live theme */
+      applySchemeInternal(scheme, false);
+      /* Save .current_color */
+      saveCurrentColor(scheme + '.properties');
+      await reloadSettings();
+      printPrompt();
+      return;
+    }
+    println('    ' + C.blu + '[' + C.red + '!' + C.blu + '] ' + C.red + 'Invalid Option, Try Again.' + C.r);
+    await sleep(800);
+    await applyColors();
+  }
+
+  /* --- apply_fonts(): bash-faithful font selection --- */
+  async function applyFonts() {
+    println('');
+    let count = 1;
+    FONTS.forEach((f) => {
+      const active = state.currentFont && state.currentFont.replace(/\.ttf$/,'') === f.id;
+      println('    ' + (active ? C.grn + '▸' : ' ') + C.yel + '[' + count + '] ' + C.wht + f.label +
+              (active ? C.gry + '  (active)' + C.r : C.r));
+      count++;
+    });
+    println('');
+    term.write('    ' + C.blu + '[' + C.red + 'Select font (1 to ' + FONTS.length + ')' + C.blu + ']: ' + C.grn);
+    const answer = await readLine();
+    println('');
+
+    const idx = parseInt(answer, 10) - 1;
+    if (!isNaN(idx) && idx >= 0 && idx < FONTS.length) {
+      const f = FONTS[idx];
+      println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Applying Fonts...' + C.r);
+      await sleep(180);
+      applyFontInternal(f.id, false);
+      saveCurrentFont(f.id + '.ttf');
+      await reloadSettings();
+      printPrompt();
+      return;
+    }
+    println('    ' + C.blu + '[' + C.red + '!' + C.blu + '] ' + C.red + 'Invalid Option, Try Again.' + C.r);
+    await sleep(800);
+    await applyFonts();
+  }
+
+  /* --- random_style() --- */
+  async function randomStyle() {
+    println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Setting Random Style...' + C.r);
+    await sleep(200);
+    const randomScheme = SCHEME_NAMES[Math.floor(Math.random() * SCHEME_NAMES.length)];
+    applySchemeInternal(randomScheme, false);
+    saveCurrentColor(randomScheme + '.properties');
+    await reloadSettings();
+    printPrompt();
+  }
+
+  /* --- import_files(): L / I option — mirrors the bash import --- */
+  async function importFiles() {
+    println('    ' + C.blu + '[' + C.red + 'L' + C.blu + '] ' + C.yel + 'Local File (Enter path to file)' + C.r);
+    println('    ' + C.blu + '[' + C.red + 'I' + C.blu + '] ' + C.yel + 'Internet File (Enter File URL)' + C.r);
+    println('');
+    term.write('    ' + C.blu + '[' + C.red + 'Select Option' + C.blu + ']: ' + C.grn);
+    const option = (await readLine()).toLowerCase();
+    println('');
+
+    if (option === 'l') {
+      term.write('    ' + C.blu + '[' + C.red + 'Enter/Paste Path To Color-scheme' + C.blu + ']: ' + C.grn);
+      const filePath = await readLine();
+      println('');
+      /* Interpret the path locally — extract .properties basename */
+      const basename = filePath.split('/').pop().replace(/\.properties$/,'');
+      const found = SCHEME_NAMES.find((s) => s === basename);
+      if (found) {
+        applySchemeInternal(found, false);
+        saveCurrentColor(found + '.properties');
+        await reloadSettings();
+        printPrompt();
+      } else {
+        println('    ' + C.blu + '[' + C.red + '!' + C.blu + '] ' + C.red + 'File not found or unknown scheme: ' + filePath + C.r);
+        await sleep(700);
+        printPrompt();
+      }
+      return;
+    }
+
+    if (option === 'i') {
+      term.write('    ' + C.blu + '[' + C.red + 'Enter Color-scheme URL' + C.blu + ']: ' + C.grn);
+      const fileLink = await readLine();
+      println('');
+      if (!fileLink) {
+        println('    ' + C.blu + '[' + C.red + '!' + C.blu + '] ' + C.red + 'No URL provided.' + C.r);
+        await sleep(600);
+        printPrompt();
+        return;
+      }
+      /* Try proxy fetch, then derive a name from the URL */
+      println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.gry + 'Fetching via free proxy pool…' + C.r);
+      const res = await proxyFetch(fileLink);
+      if (!res.ok) {
+        /* Fallback: use basename anyway */
+        const base = (fileLink.split('/').pop() || '').replace(/\.properties$/,'');
+        const match = SCHEME_NAMES.find((s) => s === base) || 'gruvbox-dark';
+        println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.yel + 'Fetch failed — using built-in fallback: ' + match + C.r);
+        applySchemeInternal(match, false);
+        saveCurrentColor(match + '.properties');
+        await reloadSettings();
+        printPrompt();
+        return;
+      }
+      println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Fetched ' +
+              (res.text.length/1024).toFixed(1) + ' KB via ' + res.via + C.r);
+      /* Try to find a matching built-in scheme by URL basename */
+      const base = (fileLink.split('/').pop() || '').replace(/\.properties$/,'');
+      const match = SCHEME_NAMES.find((s) => s === base);
+      if (match) {
+        applySchemeInternal(match, false);
+        saveCurrentColor(match + '.properties');
+      } else {
+        /* Fallback: randomly pick a similar-tone scheme */
+        applySchemeInternal('gruvbox-dark', false);
+        saveCurrentColor('gruvbox-dark.properties');
+      }
+      await reloadSettings();
+      printPrompt();
+      return;
+    }
+
+    println('    ' + C.blu + '[' + C.red + '!' + C.blu + '] ' + C.red + 'Invalid Option, Try Again.' + C.r);
+    await sleep(800);
+    await importFiles();
+  }
+
+  /* --- about_program(): faithful ASCII box --- */
+  function styleAbout() {
+    const B = C.blu;
+    println('');
+    println('    ' + B + '┌───────────────────────────────────────────────────────────────┐' + C.r);
+    println('    ' + B + '│  			     ┏━┓┏┓ ┏━┓╻ ╻╺┳╸			    │' + C.r);
+    println('    ' + B + '│  			     ┣━┫┣┻┓┃ ┃┃ ┃ ┃ 			    │' + C.r);
+    println('    ' + B + '│  			     ╹ ╹┗━┛┗━┛┗━┛ ╹ 			    │' + C.r);
+    println('    ' + B + '│───────────────────────────────────────────────────────────────│' + C.r);
+    println('    ' + B + '│                                                               │' + C.r);
+    println('    ' + B + '│ >>  \'termux-style\' is a simple program that provides color    │' + C.r);
+    println('    ' + B + '│     schemes and powerline-ready fonts to customize the        │' + C.r);
+    println('    ' + B + '│     appearance of the termux terminal emulator.               │' + C.r);
+    println('    ' + B + '│                                                               │' + C.r);
+    println('    ' + B + '│                                                               │' + C.r);
+    println('    ' + B + '│ >>  Author   :  Aditya Shakya                                 │' + C.r);
+    println('    ' + B + '│     Twitter  :  https://twitter.com/adi1090x                  │' + C.r);
+    println('    ' + B + '│     Github   :  https://github.com/adi1090x                   │' + C.r);
+    println('    ' + B + '│     Reddit   :  https://www.reddit.com/user/adi1090x          │' + C.r);
+    println('    ' + B + '│                                                               │' + C.r);
+    println('    ' + B + '└───────────────────────────────────────────────────────────────┘' + C.r);
+  }
+
+  /* --- readLine(): promise-based line reader used by style menus --- */
+  function readLine() {
+    return new Promise((resolve) => {
+      let buf = '';
+      state.menuActive = null;
+      const handler = (data) => {
+        if (data === '\r' || data === '\n') {
+          term.onData(handleInput);  /* restore normal handler */
+          state.menuActive = null;
+          resolve(buf.trim());
+          return;
+        }
+        if (data === '\x1b') {  /* ESC — return empty */
+          term.onData(handleInput);
+          state.menuActive = null;
+          resolve('');
+          return;
+        }
+        if (data === '\u007f' || data === '\b') {
+          if (buf.length) { buf = buf.slice(0, -1); term.write('\b \b'); }
+          return;
+        }
+        if (data.length === 1 && data.charCodeAt(0) >= 32) {
+          buf += data;
+          term.write(data);
+          return;
+        }
+        if (data.length > 1 && data.charCodeAt(0) !== 27) {
+          const clean = data.replace(/[\r\n\t]+/g, ' ');
+          buf += clean;
+          term.write(clean);
+        }
+      };
+      term.onData(handler);
+    });
+  }
+
+  /* --- main style menu (loops until Q) --- */
+  async function styleMenu() {
+    const cf = checkFiles();
+    while (true) {
+      styleBanner();
+      println('');
+      const activeColor = (state.currentColor || 'hex.properties').replace(/\.properties$/,'');
+      const activeFont  = (state.currentFont  || 'jetbrains.ttf').replace(/\.ttf$/,'');
+      println('    ' + C.blu + '[' + C.red + 'C' + C.blu + '] ' + C.grn + 'Colors (' + cf.total_colors + ') (' + C.cyn + activeColor + C.grn + ')' + C.r);
+      println('    ' + C.blu + '[' + C.red + 'F' + C.blu + '] ' + C.grn + 'Fonts (' + cf.total_fonts + ') (' + C.cyn + activeFont + C.grn + ')' + C.r);
+      println('    ' + C.blu + '[' + C.red + 'R' + C.blu + '] ' + C.grn + 'Random' + C.r);
+      println('    ' + C.blu + '[' + C.red + 'I' + C.blu + '] ' + C.grn + 'Import' + C.r);
+      println('    ' + C.blu + '[' + C.red + 'A' + C.blu + '] ' + C.grn + 'About' + C.r);
+      println('    ' + C.blu + '[' + C.red + 'Q' + C.blu + '] ' + C.grn + 'Quit' + C.r);
+      println('');
+      term.write('    ' + C.blu + '[' + C.red + 'Select Option' + C.blu + ']: ' + C.grn);
+      const reply = (await readLine()).toLowerCase();
+      println('');
+
+      if (reply === 'c') {
+        await applyColors();
+        await sleep(150);
+        continue;
+      }
+      if (reply === 'f') {
+        await applyFonts();
+        await sleep(150);
+        continue;
+      }
+      if (reply === 'r') {
+        await randomStyle();
+        await sleep(150);
+        continue;
+      }
+      if (reply === 'i') {
+        await importFiles();
+        await sleep(150);
+        continue;
+      }
+      if (reply === 'a') {
+        styleAbout();
+        println('');
+        term.write('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.grn + 'Press ENTER To Return To Main Menu.' + C.r);
+        await readLine();
+        continue;
+      }
+      if (reply === 'q') {
+        println('    ' + C.blu + '[' + C.red + '*' + C.blu + '] ' + C.red + 'Bye Bye, Have A Nice Day!' + C.r);
+        println('');
+        return;
+      }
+      println('    ' + C.blu + '[' + C.red + '!' + C.blu + '] ' + C.red + 'Invalid Option, Try Again.' + C.r);
+      await sleep(600);
+    }
+  }
+
+  /* --- internal appliers (used by menu / command / install) --- */
+  function applySchemeInternal(id, loud) {
+    if (!SCHEMES[id]) return;
+    state.scheme = id;
+    state.schemeLock = true;
+    term.options.theme = SCHEMES[id].theme;
+    ROOT.style.background = SCHEMES[id].theme.background;
+    if (loud) showToast('🎨 ' + SCHEMES[id].name, 'ok');
+    try { localStorage.setItem('hexai.scheme', id); } catch (e) {}
+  }
+  function applyFontInternal(id, loud) {
+    const f = FONTS.find((x) => x.id === id);
+    if (!f) return;
+    state.font = id;
+    term.options.fontFamily = f.css + ', monospace';
+    setTimeout(fitNow, 60);
+    if (loud) showToast('🔤 ' + f.label, 'ok');
+    try { localStorage.setItem('hexai.font', id); } catch (e) {}
+  }
+
+  /* --- termux-style command dispatch --- */
   async function cmdTermuxStyle(args) {
+    /* Ensure it is installed before running */
+    if (!state.tstyleInstalled) {
+      println('');
+      println(C.red + '    termux-style: command not found' + C.r);
+      println(C.gry + '    hint: run the installer first — ' + C.grn + './install' + C.gry + '  (or ' + C.grn + 'tstyle install' + C.gry + ')' + C.r);
+      println('');
+      return;
+    }
+
     const sub = (args[0] || '').toLowerCase();
-    if (sub === 'set' && args[1])   return applyScheme(args[1], true);
-    if (sub === 'font' && args[1])  return applyFont(args[1], true);
-    if (sub === 'list')             return listSchemes();
-    if (sub === 'fonts')            return listFonts();
-    if (sub === 'random')           return applyRandomScheme();
+    if (sub === 'set' && args[1]) {
+      const id = args[1].toLowerCase().replace(/\s+/g,'-');
+      if (!SCHEMES[id]) {
+        println(C.red + 'termux-style: unknown color scheme "' + args[1] + '"' + C.r);
+        println(C.gry + 'run "termux-style list" to see all schemes.' + C.r);
+        return;
+      }
+      applySchemeInternal(id, true);
+      saveCurrentColor(id + '.properties');
+      await reloadSettings();
+      return;
+    }
+    if (sub === 'font' && args[1]) {
+      const f = FONTS.find((x) => x.id === args[1].toLowerCase());
+      if (!f) {
+        println(C.red + 'termux-style: unknown font "' + args[1] + '"' + C.r);
+        println(C.gry + 'run "termux-style fonts" to see all fonts.' + C.r);
+        return;
+      }
+      applyFontInternal(f.id, true);
+      saveCurrentFont(f.id + '.ttf');
+      await reloadSettings();
+      return;
+    }
+    if (sub === 'list')    return listSchemes();
+    if (sub === 'fonts')   return listFonts();
+    if (sub === 'random')  return randomStyle();
+    if (sub === 'install')   return cmdStyleInstall();
+    if (sub === 'uninstall') return cmdStyleUninstall();
+
     await styleMenu();
   }
 
   function listSchemes() {
+    const cf = checkFiles();
     println('');
-    println(C.grn + C.b + '  AVAILABLE COLOR SCHEMES (' + SCHEME_NAMES.length + ')' + C.r);
+    println(C.grn + C.b + '  AVAILABLE COLOR SCHEMES (' + cf.total_colors + ')' + C.r);
     println(C.gry + '  ─────────────────────────────────────────' + C.r);
     SCHEME_NAMES.forEach((id, i) => {
-      const active = id === state.scheme;
+      const active = state.currentColor && state.currentColor.replace(/\.properties$/,'') === id;
       println('  ' + (active ? C.grn + '▸' + C.r : C.gry + ' ' + C.r) +
               ' ' + C.gry + pad(i + 1, 3) + C.r + '  ' +
               (active ? C.grn + C.b + id + C.r : C.wht + id + C.r) +
@@ -2279,11 +3204,12 @@
   }
 
   function listFonts() {
+    const cf = checkFiles();
     println('');
-    println(C.grn + C.b + '  AVAILABLE FONTS (' + FONTS.length + ')' + C.r);
+    println(C.grn + C.b + '  AVAILABLE FONTS (' + cf.total_fonts + ')' + C.r);
     println(C.gry + '  ─────────────────────────────────────────' + C.r);
     FONTS.forEach((f, i) => {
-      const active = f.id === state.font;
+      const active = state.currentFont && state.currentFont.replace(/\.ttf$/,'') === f.id;
       println('  ' + (active ? C.grn + '▸' + C.r : C.gry + ' ' + C.r) +
               ' ' + C.gry + pad(i + 1, 3) + C.r + '  ' +
               (active ? C.grn + C.b + f.label + C.r : C.wht + f.label + C.r) +
@@ -2294,226 +3220,8 @@
     println('');
   }
 
-  function applyScheme(name, loud) {
-    const key = name.toLowerCase().replace(/\s+/g, '-');
-    if (!SCHEMES[key]) {
-      println(C.red + 'termux-style: unknown color scheme "' + name + '"' + C.r);
-      println(C.gry + 'run "termux-style list" to see all schemes.' + C.r);
-      return;
-    }
-    state.scheme = key;
-    state.schemeLock = true;
-    term.options.theme = SCHEMES[key].theme;
-    ROOT.style.background = SCHEMES[key].theme.background;
-    if (loud) {
-      println(C.grn + '✔ color scheme → ' + C.grn + C.b + SCHEMES[key].name + C.r);
-      showToast('🎨 ' + SCHEMES[key].name, 'ok');
-    }
-    try { localStorage.setItem('hexai.scheme', key); } catch (e) {}
-  }
-
-  function applyFont(id, loud) {
-    const f = FONTS.find((x) => x.id === id);
-    if (!f) {
-      println(C.red + 'termux-style: unknown font "' + id + '"' + C.r);
-      println(C.gry + 'run "termux-style fonts" to see all fonts.' + C.r);
-      return;
-    }
-    state.font = id;
-    term.options.fontFamily = f.css + ', monospace';
-    setTimeout(fitNow, 60);
-    if (loud) {
-      println(C.grn + '✔ font → ' + C.grn + C.b + f.label + C.r);
-      showToast('🔤 ' + f.label, 'ok');
-    }
-    try { localStorage.setItem('hexai.font', id); } catch (e) {}
-  }
-
-  function applyRandomScheme() {
-    const list = SCHEME_NAMES.filter((n) => n !== state.scheme);
-    applyScheme(list[Math.floor(Math.random() * list.length)], true);
-  }
-
-  async function styleMenu() {
-    while (true) {
-      term.write('\x1b[2K\r\n');
-      term.write(
-        C.grn + C.b +
-        '  ┌──────────────────────────────────────────────────┐\r\n' +
-        '  │░▀█▀░█▀▀░█▀▄░█▄█░█░█░█░█░░░░░█▀▀░▀█▀░█░█░█░░░█▀▀░░│\r\n' +
-        '  │░░█░░█▀▀░█▀▄░█░█░█░█░▄▀▄░▄▄▄░▀▀█░░█░░░█░░█░░░█▀▀░░│\r\n' +
-        '  │░░▀░░▀▀▀░▀░▀░▀░▀░▀▀▀░▀░▀░░░░░▀▀▀░░▀░░░▀░░▀▀▀░▀▀▀░░│\r\n' +
-        '  └──────────────────────────────────────────────────┘\r\n' + C.r +
-        C.gry + '  [*] By- Aditya Shakya // adi1090x (port)\r\n\r\n' + C.r +
-        C.cyn + '  [C] Colors (' + SCHEME_NAMES.length + ')\r\n' +
-        '  [F] Fonts (' + FONTS.length + ')\r\n' +
-        '  [R] Random\r\n' +
-        '  [I] Import\r\n' +
-        '  [A] About\r\n' +
-        '  [Q] Quit\r\n\r\n' + C.r +
-        C.grn + '  [Select Option]: ' + C.r
-      );
-
-      const k = await waitKey();
-      term.write('\r\n');
-
-      if (k === 'q' || k === 'esc') { println(C.gry + '  exited termux-style.' + C.r); return; }
-      if (k === 'c') { await styleMenuColors(); continue; }
-      if (k === 'f') { await styleMenuFonts();  continue; }
-      if (k === 'r') {
-        const list = SCHEME_NAMES.filter((n) => n !== state.scheme);
-        applyScheme(list[Math.floor(Math.random() * list.length)], true);
-        println(C.gry + '  [*] Reloading Settings...' + C.r);
-        println(C.grn + '  [*] Applied Successfully.' + C.r);
-        return;
-      }
-      if (k === 'i') { await styleMenuImport(); return; }
-      if (k === 'a') {
-        println('');
-        println(C.grn + C.b + '  ABOUT TERMUX-STYLE (WEB PORT)' + C.r);
-        println(C.gry + '  ─────────────────────────────────────────' + C.r);
-        println('  Simple script to change color-schemes and fonts');
-        println('  for the Termux terminal emulator.');
-        println('');
-        println('  ' + C.cyn + 'Original:' + C.r + ' https://github.com/adi1090x/termux-style');
-        println('  ' + C.cyn + 'License :' + C.r + ' MIT');
-        println('  ' + C.cyn + 'Web port:' + C.r + ' HEX AI v3.4');
-        println('');
-        println(C.gry + '  press ENTER to return to the menu' + C.r);
-        await waitKey();
-        continue;
-      }
-      println(C.yel + '  unknown option, try C/F/R/I/A/Q' + C.r);
-    }
-  }
-
-  async function styleMenuColors() {
-    println('');
-    println(C.grn + C.b + '  SELECT COLOR-SCHEME' + C.r);
-    println(C.gry + '  ─────────────────────────────────────────' + C.r);
-    SCHEME_NAMES.forEach((id, i) => {
-      const active = id === state.scheme;
-      println('  ' + (active ? C.grn + '▸' : C.gry + ' ') + ' ' +
-              C.gry + pad(i + 1, 3) + C.r + '  ' +
-              (active ? C.grn + C.b + SCHEMES[id].name + C.r : C.wht + SCHEMES[id].name + C.r));
-    });
-    println('');
-    println(C.gry + '  enter number (or "q" to go back)' + C.r);
-    term.write(C.grn + '  [Color #]: ' + C.r);
-
-    const k = await waitKey();
-    term.write('\r\n');
-    if (k === 'q' || k === 'esc') return;
-    let buf = /[0-9]/.test(k) ? k : '';
-    if (!buf) { println(C.yel + '  invalid input' + C.r); return; }
-    while (true) {
-      term.write(C.grn + '  [Color #]: ' + C.r + buf);
-      const more = await waitKey();
-      if (more === 'enter') break;
-      if (more === 'esc') { term.write('\r\n'); return; }
-      if (more.length === 1 && /[0-9]/.test(more)) { buf += more; term.write('\x1b[2K\r'); continue; }
-      break;
-    }
-    const idx = parseInt(buf, 10) - 1;
-    term.write('\r\n');
-    if (isNaN(idx) || idx < 0 || idx >= SCHEME_NAMES.length) { println(C.red + '  invalid selection' + C.r); return; }
-    applyScheme(SCHEME_NAMES[idx], true);
-    println(C.gry + '  [*] Reloading Settings...' + C.r);
-    println(C.grn + '  [*] Applied Successfully.' + C.r);
-    await sleep(250);
-  }
-
-  async function styleMenuFonts() {
-    println('');
-    println(C.grn + C.b + '  SELECT FONT' + C.r);
-    println(C.gry + '  ─────────────────────────────────────────' + C.r);
-    FONTS.forEach((f, i) => {
-      const active = f.id === state.font;
-      println('  ' + (active ? C.grn + '▸' : C.gry + ' ') + ' ' +
-              C.gry + pad(i + 1, 3) + C.r + '  ' +
-              (active ? C.grn + C.b + f.label + C.r : C.wht + f.label + C.r));
-    });
-    println('');
-    println(C.gry + '  enter number (or "q" to go back)' + C.r);
-    term.write(C.grn + '  [Font #]: ' + C.r);
-
-    const k = await waitKey();
-    term.write('\r\n');
-    if (k === 'q' || k === 'esc') return;
-    let buf = /[0-9]/.test(k) ? k : '';
-    if (!buf) { println(C.yel + '  invalid input' + C.r); return; }
-    while (true) {
-      term.write(C.grn + '  [Font #]: ' + C.r + buf);
-      const more = await waitKey();
-      if (more === 'enter') break;
-      if (more === 'esc') { term.write('\r\n'); return; }
-      if (more.length === 1 && /[0-9]/.test(more)) { buf += more; term.write('\x1b[2K\r'); continue; }
-      break;
-    }
-    const idx = parseInt(buf, 10) - 1;
-    term.write('\r\n');
-    if (isNaN(idx) || idx < 0 || idx >= FONTS.length) { println(C.red + '  invalid selection' + C.r); return; }
-    applyFont(FONTS[idx].id, true);
-    await sleep(200);
-  }
-
-  async function styleMenuImport() {
-    println('');
-    println(C.grn + C.b + '  IMPORT COLOR-SCHEME' + C.r);
-    println(C.gry + '  ─────────────────────────────────────────' + C.r);
-    println('  ' + C.cyn + '[1]' + C.r + ' Local file (enter scheme name)');
-    println('  ' + C.cyn + '[2]' + C.r + ' Internet file (enter URL to properties)');
-    println('');
-    println(C.gry + '  enter choice number (or "q")' + C.r);
-    term.write(C.grn + '  [Select Option]: ' + C.r);
-
-    const choice = await waitKey();
-    term.write('\r\n');
-    if (choice === 'q' || choice === 'esc') return;
-
-    if (choice === '1') {
-      println(C.gry + '  enter scheme name from the built-in list:' + C.r);
-      println(C.gry + '  ' + SCHEME_NAMES.slice(0, 8).join(', ') + ', …' + C.r);
-      println('');
-      println(C.yel + '  (interactive text entry is limited — use:' + C.r);
-      println(C.yel + '   termux-style set <name> )' + C.r);
-      await sleep(300);
-      return;
-    }
-
-    if (choice === '2') {
-      println(C.gry + '  fetching a demo gruvbox-dark scheme from adi1090x repo…' + C.r);
-      const url = 'https://raw.githubusercontent.com/adi1090x/termux-style/master/colors/gruvbox-dark.properties';
-      const res = await proxyFetch(url);
-      if (!res.ok) { println(C.red + '  fetch failed — all proxy nodes unreachable' + C.r); return; }
-      println('');
-      println(C.grn + C.b + '  ✔ fetched ' + (res.text.length / 1024).toFixed(1) + ' KB via ' + res.via + C.r);
-      println(C.gry + '  ── preview ──' + C.r);
-      res.text.split('\n').slice(0, 6).forEach((l) =>
-        println('  ' + C.gry + '│' + C.r + ' ' + C.wht + l + C.r));
-      println('');
-      println(C.grn + '  [*] Imported successfully (using gruvbox-dark values)' + C.r);
-      applyScheme('gruvbox-dark', true);
-      return;
-    }
-    println(C.yel + '  invalid choice' + C.r);
-  }
-
-  /* waitKey — returns the next single keystroke (or "enter"/"esc") */
-  function waitKey() {
-    return new Promise((resolve) => {
-      state.menuActive = (data) => {
-        if (data === '\r' || data === '\n') return resolve('enter');
-        if (data === '\x1b') return resolve('esc');
-        if (data === '\u007f') return resolve('back');
-        if (data.length === 1) return resolve(data.toLowerCase());
-        resolve('');
-      };
-    });
-  }
-
   /* ------------------------------------------------------------
-     23. TERMUX ADDON COMMANDS
+     24. TERMUX ADDON COMMANDS
      ------------------------------------------------------------ */
   function cmdAddonBoot() {
     if (!state.installed['termux-boot']) {
@@ -2564,12 +3272,12 @@
   }
 
   /* ------------------------------------------------------------
-     24. HELP / ABOUT / BANNER / etc
+     25. HELP / ABOUT / BANNER
      ------------------------------------------------------------ */
   async function cmdHelp() {
     println('');
     println(C.grn + C.b + '  ╔══════════════════════════════════════════╗' + C.r);
-    println(C.grn + C.b + '  ║      HEX AI v3.4 ▸ COMMAND INDEX         ║' + C.r);
+    println(C.grn + C.b + '  ║      HEX AI v3.6 ▸ COMMAND INDEX         ║' + C.r);
     println(C.grn + C.b + '  ╚══════════════════════════════════════════╝' + C.r);
     println('');
     const rows = [
@@ -2585,7 +3293,12 @@
       ['pwd / ls / cd',   'virtual filesystem'],
       ['cat <file>',      'read a virtual file'],
       ['history',         'show command history'],
-      ['ai <question>',   '★ ask the LIVE AI'],
+      ['ai <question>',   '★ ask the LIVE AI (gen.pollinations.ai)'],
+      ['ai --key [k]',    '★ set the Pollinations API key'],
+      ['ai --key-clear',  'remove the stored API key'],
+      ['ai --key-show',   'show stored key (masked)'],
+      ['ai --models',     'list models from the API'],
+      ['ai --model <id>', 'select AI model'],
       ['ai --clear',      'reset conversation memory'],
       ['ai --status',     'check the live AI endpoint'],
       ['theme auto|dark|light', 'set interface theme'],
@@ -2601,16 +3314,20 @@
       ['exit',            'close the session']
     ];
     rows.forEach((r) => {
-      println('  ' + C.cyn + r[0].padEnd(22, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
+      println('  ' + C.cyn + r[0].padEnd(24, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
     });
 
     println('');
-    println(C.mag + C.b + '  ⚡ TERMUX-STYLE' + C.r + C.gry + '  (requires: pkg install termux-styling)' + C.r);
+    println(C.mag + C.b + '  ⚡ TERMUX-STYLE (adi1090x/termux-style port)' + C.r);
     println('');
-    println('  ' + C.cyn + 'termux-style'.padEnd(22, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'interactive style menu' + C.r);
-    println('  ' + C.cyn + 'termux-style list'.padEnd(22, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'list color-schemes' + C.r);
-    println('  ' + C.cyn + 'termux-style set <n>'.padEnd(22, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply color-scheme' + C.r);
-    println('  ' + C.cyn + 'termux-style font <id>'.padEnd(22, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply font' + C.r);
+    println('  ' + C.cyn + './install'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'install termux-style (bash port)' + C.r);
+    println('  ' + C.cyn + './uninstall'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'uninstall termux-style' + C.r);
+    println('  ' + C.cyn + 'termux-style'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'interactive style menu' + C.r);
+    println('  ' + C.cyn + 'termux-style list'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'list ' + SCHEME_NAMES.length + ' color-schemes' + C.r);
+    println('  ' + C.cyn + 'termux-style fonts'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'list ' + FONTS.length + ' fonts' + C.r);
+    println('  ' + C.cyn + 'termux-style set <id>'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply color-scheme' + C.r);
+    println('  ' + C.cyn + 'termux-style font <id>'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply font' + C.r);
+    println('  ' + C.cyn + 'termux-style random'.padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + 'apply a random color-scheme' + C.r);
     println('');
 
     println(C.mag + C.b + '  ⚡ TERMUX:API COMMANDS' + C.r + C.gry + '  (requires: pkg install termux-api)' + C.r);
@@ -2638,54 +3355,33 @@
       println('  ' + C.cyn + r[0].padEnd(28, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
     });
     println('');
-
-    println(C.mag + C.b + '  ⚡ TERMUX ADDONS' + C.r);
-    println('');
-    const addons = [
-      ['termux-boot',    'run scripts on boot'],
-      ['termux-float',   'floating window mode'],
-      ['termux-styling', 'color-schemes & fonts'],
-      ['termux-tasker',  'Tasker automation bridge'],
-      ['termux-widget',  'home-screen scriptlets']
-    ];
-    addons.forEach((r) => {
-      const inst = state.installed[r[0]];
-      const mark = inst ? C.grn + ' ● ' + C.r : C.gry + ' ○ ' + C.r;
-      const nm   = inst ? C.grn + r[0].padEnd(16, ' ') + C.r : C.wht + r[0].padEnd(16, ' ') + C.r;
-      println('  ' + mark + nm + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
-    });
-    println('');
-
-    println(C.yel + C.b + '  ⚡ PACKAGE COMMANDS' + C.r + C.gry + '  (install first with: pkg install <name>)' + C.r);
-    println('');
-    Object.keys(PACKAGES).forEach((name) => {
-      const inst = state.installed[name];
-      const mark = inst ? C.grn + ' ● ' + C.r : C.gry + ' ○ ' + C.r;
-      const nm = inst ? C.grn + C.b + name.padEnd(18, ' ') + C.r : C.gry + name.padEnd(18, ' ') + C.r;
-      println('  ' + mark + nm + C.gry + '│' + C.r + ' ' + C.wht + PACKAGES[name].desc + C.r);
-    });
-
-    println('');
-    println(C.gry + '  tip: use the on-screen key row below for arrows, TAB and CTRL.' + C.r);
-    println(C.gry + '  long-press the terminal for a Termux-style context menu.' + C.r);
-    println('');
   }
 
   async function cmdAbout() {
     println('');
-    println(C.grn + C.b + '  HEX AI — Termux Web Terminal v3.4' + C.r);
+    println(C.grn + C.b + '  HEX AI — Termux Web Terminal v3.6' + C.r);
     println(C.gry + '  ────────────────────────────────────────────' + C.r);
     println('  ' + C.cyn + 'Engine    :' + C.r + ' xterm.js 5.5.0 (GPU-ready frontend)');
     println('  ' + C.cyn + 'Addons    :' + C.r + ' fit · web-links');
     println('  ' + C.cyn + 'Runtime   :' + C.r + ' 100% client-side JavaScript');
-    println('  ' + C.cyn + 'AI        :' + C.r + ' Pollinations.ai text API (no API key · free)');
+    println('  ' + C.cyn + 'AI        :' + C.r + ' gen.pollinations.ai (OpenAI-compatible)');
+    println('  ' + C.cyn + 'Base URL  :' + C.r + ' ' + HEX_AI_BASE);
     println('  ' + C.cyn + 'Endpoint  :' + C.r + ' ' + HEX_AI_ENDPOINT);
-    println('  ' + C.cyn + 'Model     :' + C.r + ' ' + HEX_AI_MODEL + ' (OpenAI-compatible)');
+    println('  ' + C.cyn + 'Models    :' + C.r + ' ' + HEX_AI_MODELS_URL);
+    println('  ' + C.cyn + 'Model     :' + C.r + ' ' + state.model);
+    println('  ' + C.cyn + 'API key   :' + C.r + ' ' +
+            (state.apiKey
+              ? C.grn + maskKey(state.apiKey) + C.r
+              : C.yel + 'not set' + C.r + C.gry + ' (legacy fallback active)' + C.r));
     println('  ' + C.cyn + 'Theme     :' + C.r + ' ' + ThemeEngine.get() + ' (auto/dark/light)');
-    println('  ' + C.cyn + 'System    :' + C.r + ' ' +
-            ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-              ? 'device prefers dark' : 'device prefers light'));
-    println('  ' + C.cyn + 'Termux    :' + C.r + ' termux-api bridge · termux-style port');
+    println('  ' + C.cyn + 'Scheme    :' + C.r + ' ' +
+            (state.currentColor ? state.currentColor.replace(/\.properties$/,'') : state.scheme));
+    println('  ' + C.cyn + 'Font      :' + C.r + ' ' +
+            (state.currentFont ? state.currentFont.replace(/\.ttf$/,'') : state.font));
+    println('  ' + C.cyn + 'Style lib :' + C.r + ' ' + SCHEME_NAMES.length + ' color-schemes · ' + FONTS.length + ' fonts');
+    println('  ' + C.cyn + 'tstyle    :' + C.r + ' ' +
+            (state.tstyleInstalled ? C.grn + 'installed' + C.r : C.yel + 'not installed' + C.r));
+    println('  ' + C.cyn + 'Termux    :' + C.r + ' termux-api bridge');
     println('  ' + C.cyn + 'Interface :' + C.r + ' Android-authentic Termux mobile UI');
     println('');
     println(C.gry + '  Projects this terminal builds upon:' + C.r);
@@ -2710,11 +3406,11 @@
     println('');
     for (let i = 0; i < art.length; i++) { println(cols[i] + art[i] + C.r); await sleep(45); }
     println('');
-    println(C.gry + '   T E R M U X   W E B   T E R M I N A L   v 3 . 4' + C.r);
+    println(C.gry + '   T E R M U X   W E B   T E R M I N A L   v 3 . 6' + C.r);
     println(C.grn + '   ──────────────────────────────────────────────────' + C.r);
     println('   ' + C.cyn + 'engine ' + C.r + C.wht + 'xterm.js' + C.r +
-            C.gry + '  ·  ' + C.r + C.cyn + 'AI ' + C.r + C.wht + 'pollinations' + C.r +
-            C.gry + '  ·  ' + C.r + C.cyn + 'theme ' + C.r + C.wht + ThemeEngine.get() + C.r);
+            C.gry + '  ·  ' + C.r + C.cyn + 'AI ' + C.r + C.wht + 'gen.pollinations.ai' + C.r +
+            C.gry + '  ·  ' + C.r + C.cyn + 'style ' + C.r + C.wht + SCHEME_NAMES.length + ' colors' + C.r);
     println('');
   }
 
@@ -2741,16 +3437,22 @@
       '  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝'
     ];
     const rows = [
-      ['OS',       'HEX AI Web Terminal 3.4'],
+      ['OS',       'HEX AI Web Terminal 3.6'],
       ['Host',     'xterm.js 5.5.0'],
       ['Kernel',   'browser-js-2026'],
       ['Uptime',   Math.floor(performance.now() / 1000) + 's'],
-      ['Shell',    'hexsh 1.5'],
+      ['Shell',    'hexsh 1.6'],
       ['Theme',    ThemeEngine.get() + ' (' + ThemeEngine.effective() + ')'],
-      ['AI',       state.aiLive ? 'pollinations (live)' : 'offline KB'],
-      ['Model',    HEX_AI_MODEL],
-      ['Scheme',   SCHEMES[state.scheme] ? SCHEMES[state.scheme].name : state.scheme],
-      ['Font',     (FONTS.find((f) => f.id === state.font) || {label:'?'}).label],
+      ['AI',       state.aiLive
+                    ? (state.apiKey ? 'gen.pollinations.ai' : 'legacy fallback')
+                    : 'offline KB'],
+      ['Model',    state.model],
+      ['Key',      state.apiKey ? maskKey(state.apiKey) : '(not set)'],
+      ['Scheme',   (state.currentColor || state.scheme + '.properties').replace(/\.properties$/,'')],
+      ['Font',     (state.currentFont || state.font + '.ttf').replace(/\.ttf$/,'')],
+      ['Colors',   SCHEME_NAMES.length + ' available'],
+      ['Fonts',    FONTS.length + ' available'],
+      ['tstyle',   state.tstyleInstalled ? 'installed' : 'not installed'],
       ['User',     state.user + '@' + state.host],
       ['Proxy',    state.proxy ? 'free pool (' + (PROXIES_POST.length + PROXIES_GET.length) + ' nodes)' : 'disabled'],
       ['Packages', Object.keys(state.installed).length + ' / ' + Object.keys(PACKAGES).length],
@@ -2772,7 +3474,6 @@
     println('');
   }
 
-  /* ---- virtual filesystem ---- */
   async function cmdLs(args) {
     const entries = FS[state.cwd] || [];
     if (!entries.length) { println(C.gry + '(empty directory)' + C.r); return; }
@@ -2803,18 +3504,22 @@
   }
 
   /* ------------------------------------------------------------
-     25. OFFLINE AI KB
+     26. OFFLINE AI KB
      ------------------------------------------------------------ */
   const AI_KB = [
-    { k: ['hello','hi','hey','salam','assalam','good morning','good evening'],
-      a: ['Hey there 👋 I am HEX AI v3.4. Ask me anything or type "help".',
+    { k: ['hello','hi','hey','salam','assalam'],
+      a: ['Hey there 👋 I am HEX AI v3.6. Ask me anything or type "help".',
           'Hello! Terminal link established. What shall we run today?'] },
     { k: ['who are you','your name','what are you','introduce yourself'],
-      a: ['I am HEX AI — a live-AI-powered terminal with a Termux-authentic mobile interface. My answers come from the Pollinations.ai text API (free, no API key).'] },
+      a: ['I am HEX AI — a live-AI-powered terminal with a Termux-authentic mobile interface. My answers come from gen.pollinations.ai (OpenAI-compatible).'] },
     { k: ['what can you do','capabilities','features','commands'],
-      a: ['I answer questions via a live LLM, run shell-style commands, fetch URLs via a free CORS proxy pool, install virtual packages, talk to browser hardware via termux-api, and manage 30 colour schemes + 20 fonts through termux-style.'] },
+      a: ['I answer questions via a live LLM, run shell-style commands, fetch URLs via a free CORS proxy pool, install virtual packages, talk to browser hardware via termux-api, and manage 89 colour schemes + 20 fonts through termux-style.'] },
+    { k: ['api key','apikey','pollinations key','enter.pollinations'],
+      a: ['Get a free key at https://enter.pollinations.ai then run: ai --key <your_key>. Without a key I fall back to the legacy text.pollinations.ai endpoint.'] },
     { k: ['theme','dark mode','light mode','auto theme','appearance'],
-      a: ['Use "theme auto" to follow your device preference, "theme dark" for forced dark mode, or "theme light" for forced light. "theme cycle" toggles between them. The title-bar moon icon cycles too.'] },
+      a: ['Use "theme auto" to follow your device preference, "theme dark" for forced dark mode, or "theme light" for forced light. "theme cycle" toggles between them.'] },
+    { k: ['termux-style','termux style','tstyle','install style'],
+      a: ['Run ./install to install the termux-style port. Then use "termux-style" for the interactive menu, or "termux-style set <name>" and "termux-style font <id>" directly. 89 colors · 20 fonts.'] },
     { k: ['proxy','cors','fetch','internet'],
       a: ['Network requests route through ' + (PROXIES_POST.length + PROXIES_GET.length) + ' free CORS proxies with automatic failover. Use: fetch <url>.'] },
     { k: ['xterm','xterm.js','how do you work'],
@@ -2822,9 +3527,7 @@
     { k: ['termux','android','mobile','phone'],
       a: ['This is a Termux-authentic mobile interface — session drawer, three-dot menu, extra-keys row, long-press context menu. Just like the real app from F-Droid.'] },
     { k: ['termux-api','api','battery','vibrate','notification','clipboard','tts'],
-      a: ['Install with "pkg install termux-api". Then use termux-battery-status, termux-vibrate, termux-clipboard-set/get, termux-notification, termux-tts-speak, termux-location, termux-toast, termux-share, termux-dialog, termux-camera-photo and 20+ more.'] },
-    { k: ['termux-style','color','colour','theme','font'],
-      a: ['Install with "pkg install termux-styling". Then run "termux-style" for the interactive menu, or "termux-style set <name>" and "termux-style font <id>" directly.'] },
+      a: ['Install with "pkg install termux-api". Then use termux-battery-status, termux-vibrate, termux-clipboard-set/get, termux-notification, termux-tts-speak, termux-location and 20+ more.'] },
     { k: ['package','install','pkg','apt'],
       a: ['Use "pkg list" to see every package and "pkg install <name>" to add it.'] },
     { k: ['thank','thanks','thx'],
@@ -2855,37 +3558,186 @@
   }
 
   /* ------------------------------------------------------------
-     26. AI COMMAND
+     27. AI COMMAND
      ------------------------------------------------------------ */
   async function cmdAI(args) {
-    if (args[0] === '--clear' || args[0] === '--reset') {
+    const sub = (args[0] || '').toLowerCase();
+
+    if (sub === '--key' || sub === '-k' || sub === 'key') {
+      let k = args[1];
+      if (!k) {
+        k = window.prompt(
+          'Paste your Pollinations API key\n' +
+          '(from https://enter.pollinations.ai — starts with sk_ or pk_):',
+          ''
+        );
+        if (k === null) { println(C.yel + 'cancelled' + C.r); return; }
+      }
+      k = String(k).trim();
+      if (!k) { println(C.yel + 'no key provided' + C.r); return; }
+      if (!keyLooksValid(k)) {
+        println(C.yel + '⚠ warning: key does not look like a pk_/sk_ key' + C.r);
+      }
+      saveApiKey(k);
+      state.aiLive = true;
+      println('');
+      println(C.grn + C.b + '  ✔ API key saved' + C.r);
+      println('  ' + C.cyn + 'stored  : ' + C.r + C.wht + maskKey(k) + C.r);
+      println('  ' + C.cyn + 'endpoint: ' + C.r + C.wht + HEX_AI_ENDPOINT + C.r);
+      println('  ' + C.cyn + 'model   : ' + C.r + C.wht + state.model + C.r);
+      println('');
+      showToast('🔑 API key saved', 'ok');
+      return;
+    }
+
+    if (sub === '--key-clear' || sub === '-kc') {
+      saveApiKey(null);
+      println(C.grn + '✔ API key cleared — falling back to legacy endpoint' + C.r);
+      return;
+    }
+
+    if (sub === '--key-show' || sub === '-ks') {
+      println('');
+      println(C.grn + C.b + '  API KEY' + C.r);
+      println(C.gry + '  ─────────────────────────────────────────' + C.r);
+      println('  ' + C.cyn + 'stored : ' + C.r +
+              (state.apiKey ? C.wht + maskKey(state.apiKey) + C.r : C.yel + '(not set)' + C.r));
+      println('  ' + C.cyn + 'length : ' + C.r + C.wht + (state.apiKey ? state.apiKey.length : 0) + C.r);
+      println('  ' + C.cyn + 'source : ' + C.r + C.gry + 'localStorage:' + HEX_AI_KEY_STORAGE + C.r);
+      println('');
+      return;
+    }
+
+    if (sub === '--model' || '-m') {
+      const m = args[1];
+      if (!m) {
+        println(C.yel + 'usage: ai --model <model-id>' + C.r);
+        println(C.gry + 'current: ' + state.model + C.r);
+        return;
+      }
+      saveModel(m);
+      println(C.grn + '✔ model → ' + C.grn + C.b + m + C.r);
+      return;
+    }
+
+    if (sub === '--model-clear') {
+      saveModel(null);
+      println(C.grn + '✔ model reset to default: ' + HEX_AI_DEFAULT_MODEL + C.r);
+      return;
+    }
+
+    if (sub === '--models' || '-ml') {
+      println('');
+      println(C.grn + C.b + '  POLLINATIONS MODEL CATALOG' + C.r);
+      println(C.gry + '  ─────────────────────────────────────────' + C.r);
+      println('  ' + C.gry + 'fetching from ' + HEX_AI_MODELS_URL + ' …' + C.r);
+      let printed = false;
+      try {
+        const ctrl = new AbortController();
+        const to = setTimeout(() => ctrl.abort(), 8000);
+        const r = await fetch(HEX_AI_MODELS_URL, { signal: ctrl.signal });
+        clearTimeout(to);
+        if (r.ok) {
+          const data = await r.json();
+          const list = (data && (data.data || data.models)) || [];
+          if (Array.isArray(list) && list.length) {
+            const shown = list.slice(0, 40);
+            shown.forEach((m) => {
+              const id  = m.id || m.name || String(m);
+              const pub = m.publisher || (m.owned_by ? m.owned_by : '');
+              const act = id === state.model;
+              println('  ' + (act ? C.grn + '▸' : C.gry + ' ') + ' ' +
+                      (act ? C.grn + C.b + id + C.r : C.wht + id + C.r) +
+                      (pub ? C.gry + '  (' + pub + ')' + C.r : ''));
+            });
+            if (list.length > shown.length) {
+              println(C.gry + '  … and ' + (list.length - shown.length) + ' more' + C.r);
+            }
+            printed = true;
+          }
+        }
+      } catch (e) {}
+
+      if (!printed) {
+        println(C.yel + '  ⚠ live fetch failed — showing known models' + C.r);
+        println('');
+        HEX_AI_MODELS_HINT.forEach((m) => {
+          const act = m === state.model;
+          println('  ' + (act ? C.grn + '▸' : C.gry + ' ') + ' ' +
+                  (act ? C.grn + C.b + m + C.r : C.wht + m + C.r));
+        });
+      }
+      println('');
+      println(C.gry + '  current: ' + C.grn + C.b + state.model + C.r);
+      println(C.gry + '  set   : ' + C.cyn + 'ai --model <id>' + C.r);
+      println('');
+      return;
+    }
+
+    if (sub === '--clear' || sub === '--reset') {
       resetConversation();
       println(C.grn + '✔ conversation memory cleared' + C.r);
       return;
     }
-    if (args[0] === '--status') {
+
+    if (sub === '--status') {
+      const eff = state.apiKey
+        ? 'gen.pollinations.ai (LIVE, key: ' + maskKey(state.apiKey) + ')'
+        : 'legacy text.pollinations.ai (no key)';
       println('');
       println(C.grn + C.b + '  HEX AI — LIVE STATUS' + C.r);
       println(C.gry + '  ─────────────────────────────────────────' + C.r);
+      println('  ' + C.cyn + 'provider : ' + C.r + C.wht + 'Pollinations.ai' + C.r);
+      println('  ' + C.cyn + 'base     : ' + C.r + C.wht + HEX_AI_BASE + C.r);
       println('  ' + C.cyn + 'endpoint : ' + C.r + C.wht + HEX_AI_ENDPOINT + C.r);
-      println('  ' + C.cyn + 'get-base : ' + C.r + C.wht + HEX_AI_GET_BASE + C.r);
-      println('  ' + C.cyn + 'model    : ' + C.r + C.wht + HEX_AI_MODEL + C.r);
-      println('  ' + C.cyn + 'api key  : ' + C.r + C.grn + 'none required' + C.r);
+      println('  ' + C.cyn + 'models   : ' + C.r + C.wht + HEX_AI_MODELS_URL + C.r);
+      println('  ' + C.cyn + 'legacy   : ' + C.r + C.wht + HEX_AI_LEGACY_ENDPOINT + C.r);
+      println('  ' + C.cyn + 'model    : ' + C.r + C.wht + state.model + C.r);
+      println('  ' + C.cyn + 'auth     : ' + C.r +
+              (state.apiKey ? C.grn + 'Bearer + ?key=' + C.r : C.yel + 'none (legacy fallback)' + C.r));
+      println('  ' + C.cyn + 'keys url : ' + C.r + C.wht + 'https://enter.pollinations.ai' + C.r);
       println('  ' + C.cyn + 'stream   : ' + C.r + C.wht + 'yes (SSE) + GET fallback' + C.r);
       println('  ' + C.cyn + 'memory   : ' + C.r + C.wht + (conversation.length - 1) + ' / ' + MAX_TURNS + ' turns' + C.r);
       println('  ' + C.cyn + 'mode     : ' + C.r +
-              (state.aiLive ? C.grn + 'LIVE' + C.r : C.yel + 'OFFLINE (local KB)' + C.r));
+              (state.aiLive ? C.grn + 'LIVE' + C.r + C.gry + ' (' + eff + ')' + C.r
+                            : C.yel + 'OFFLINE (local KB)' + C.r));
       println('');
       return;
     }
-    if (args[0] === '--offline') { state.aiLive = false; println(C.yel + '⚠ HEX AI switched to offline mode' + C.r); return; }
-    if (args[0] === '--online')  { state.aiLive = true;  println(C.grn + '✔ HEX AI switched to LIVE mode' + C.r); return; }
+
+    if (sub === '--offline') { state.aiLive = false; println(C.yel + '⚠ HEX AI switched to offline mode' + C.r); return; }
+    if (sub === '--online')  { state.aiLive = true;  println(C.grn + '✔ HEX AI switched to LIVE mode' + C.r); return; }
+
+    if (sub === '--help' || sub === '-h') {
+      println('');
+      println(C.grn + C.b + '  ai COMMAND — USAGE' + C.r);
+      println(C.gry + '  ─────────────────────────────────────────' + C.r);
+      const rows = [
+        ['ai <question>',       'ask the live AI'],
+        ['ai --key [k]',        'set API key (prompts if omitted)'],
+        ['ai --key-show',       'show stored key (masked)'],
+        ['ai --key-clear',      'remove the stored key'],
+        ['ai --models',         'list models from the catalog'],
+        ['ai --model <id>',     'select a model'],
+        ['ai --model-clear',    'reset to default model'],
+        ['ai --clear',          'clear conversation memory'],
+        ['ai --status',         'show full status'],
+        ['ai --offline',        'use local KB only'],
+        ['ai --online',         're-enable live AI'],
+        ['ai --help',           'this message']
+      ];
+      rows.forEach((r) => {
+        println('  ' + C.cyn + r[0].padEnd(22, ' ') + C.r + C.gry + '│' + C.r + ' ' + C.wht + r[1] + C.r);
+      });
+      println('');
+      return;
+    }
 
     const q = args.join(' ').trim();
     if (!q) {
       println('');
       println(C.grn + '  HEX AI ▸ usage: ai <your question>' + C.r);
-      println(C.gry + '  examples: ai what is xterm.js | ai --clear | ai --status' + C.r);
+      println(C.gry + '  examples: ai what is xterm.js | ai --key pk_… | ai --models' + C.r);
       println('');
       return;
     }
@@ -2898,8 +3750,19 @@
       return;
     }
 
+    if (!state.apiKey && !state._keyWarned) {
+      state._keyWarned = true;
+      println('');
+      println(C.yel + '  ⚠ No API key set — using legacy fallback.' + C.r);
+      println(C.gry + '    For the upgraded AI, get a free key at ' +
+              C.cyn + 'https://enter.pollinations.ai' + C.r);
+      println(C.gry + '    then run: ' + C.grn + 'ai --key <your_key>' + C.r);
+    }
+
     println('');
-    term.write('  ' + C.grn + C.b + '╭─ HEX AI ' + C.r + C.gry + '──────── live · ' + HEX_AI_MODEL + ' ────────' + C.r + '\r\n');
+    term.write('  ' + C.grn + C.b + '╭─ HEX AI ' + C.r + C.gry +
+               '──────── ' + (state.apiKey ? 'gen.pollinations.ai' : 'legacy fallback') +
+               ' · ' + state.model + ' ────────' + C.r + '\r\n');
     const spinFrames = ['⠋','⠙','⠹','⠸','⠼','⠴','⠦','⠧','⠇','⠏'];
     let spinIdx = 0;
     let gotFirstToken = false;
@@ -2952,7 +3815,12 @@
 
     if (!gotFirstToken) term.write('\x1b[2K\r  ' + C.grn + '│ ' + C.r);
     println('');
-    println('  ' + C.grn + '╰─ ' + C.yel + 'live endpoint unreachable — falling back to local KB' + C.r);
+    if (!state.apiKey) {
+      println('  ' + C.grn + '╰─ ' + C.yel + 'live endpoints unreachable — falling back to local KB' + C.r);
+      println('  ' + C.gry + '    tip: set an API key with ' + C.grn + 'ai --key <key>' + C.gry + ' to enable the upgraded AI.' + C.r);
+    } else {
+      println('  ' + C.grn + '╰─ ' + C.yel + 'live endpoints unreachable — falling back to local KB' + C.r);
+    }
     println('');
 
     const fallback = offlineReply(q);
@@ -2966,7 +3834,9 @@
     setStatus('online');
   }
 
-  /* ---- fetch / open / proxy / matrix / pkg / reboot / exit ---- */
+  /* ------------------------------------------------------------
+     28. FETCH / OPEN / PROXY / MATRIX / PKG / REBOOT / EXIT
+     ------------------------------------------------------------ */
   async function cmdFetch(args) {
     const raw = args.filter((a) => a.charAt(0) !== '-');
     let url = raw[0];
@@ -3081,7 +3951,9 @@
       println('');
       println(C.grn + C.b + '✔ ' + name + ' installed successfully.' + C.r);
       if (name === 'termux-api')         println(C.gry + 'run "termux-api" for the full command list.' + C.r);
-      else if (name === 'termux-styling') println(C.gry + 'run "termux-style" for the interactive menu.' + C.r);
+      else if (name === 'termux-styling') {
+        println(C.gry + 'run "./install" to complete the termux-style port, then "termux-style".' + C.r);
+      }
       else if (name === 'termux-float')   println(C.gry + 'run "termux-float on|off" to toggle floating mode.' + C.r);
       else if (name === 'termux-boot')    println(C.gry + 'run "termux-boot" to inspect boot scripts.' + C.r);
       else if (name === 'termux-tasker')  println(C.gry + 'run "termux-tasker" for the Tasker bridge.' + C.r);
@@ -3096,6 +3968,7 @@
       await progressBar('removing ' + name);
       delete state.installed[name];
       if (name === 'termux-float') ROOT.classList.remove('hx-float');
+      if (name === 'termux-styling') state.tstyleInstalled = false;
       println(C.grn + '✔ ' + name + ' removed.' + C.r);
       return;
     }
@@ -3144,7 +4017,7 @@
     println('');
     println(C.grn + '  ╭──────────────────────────────────────╮' + C.r);
     println(C.grn + '  │  session closed — thanks for using   │' + C.r);
-    println(C.grn + '  │  HEX AI v3.4 · type "reboot" to       │' + C.r);
+    println(C.grn + '  │  HEX AI v3.6 · type "reboot" to       │' + C.r);
     println(C.grn + '  │  return to the terminal              │' + C.r);
     println(C.grn + '  ╰──────────────────────────────────────╯' + C.r);
     println('');
@@ -3152,7 +4025,7 @@
   }
 
   /* ------------------------------------------------------------
-     27. PACKAGE-GATED CLASSIC COMMANDS
+     29. PACKAGE-GATED CLASSIC COMMANDS
      ------------------------------------------------------------ */
   async function cmdPython(args) {
     const expr = args.join(' ');
@@ -3224,7 +4097,7 @@
       ['77',  'hexai', '0.6', '3.2', 'xterm-renderer'],
       ['120', 'hexai', '0.2', '1.4', 'proxy-pool'],
       ['140', 'hexai', '0.4', '2.0', 'termux-api-bridge'],
-      ['155', 'hexai', '0.8', '3.6', 'pollinations-llm'],
+      ['155', 'hexai', '0.8', '3.6', 'gen.pollinations-llm'],
       ['256', 'hexai', '0.1', '0.9', 'pkg-daemon'],
       ['512', 'guest', '0.0', '0.5', 'browser-event-loop']
     ];
@@ -3275,7 +4148,7 @@
   async function cmdGit(args) {
     const sub = (args[0] || '').toLowerCase();
     if (sub === 'clone') {
-      const repo = args[1] || 'https://github.com/xtermjs/xterm.js';
+      const repo = args[1] || 'https://github.com/adi1090x/termux-style';
       println(C.cyn + "Cloning into '" + repo.split('/').pop().replace('.git','') + "'..." + C.r);
       await progressBar('objects');
       println(C.grn + '✔ clone complete (virtual)' + C.r);
@@ -3283,9 +4156,9 @@
     }
     if (sub === 'status') { println('On branch ' + C.grn + 'main' + C.r); println('nothing to commit, working tree clean'); return; }
     if (sub === 'log') {
-      println(C.yel + 'commit a1b2c3d' + C.r + '  HEX AI core v3.4 — Termux UI');
+      println(C.yel + 'commit c1d2e3f' + C.r + '  HEX AI core v3.6 — termux-style 89 colors');
+      println(C.yel + 'commit a1b2c3d' + C.r + '  v3.5 — gen.pollinations.ai');
       println(C.yel + 'commit e4f5g6h' + C.r + '  add termux-api bridge');
-      println(C.yel + 'commit i7j8k9l' + C.r + '  port termux-style');
       return;
     }
     println(C.gry + 'usage: git clone|status|log' + C.r);
@@ -3325,7 +4198,7 @@
   }
 
   /* ------------------------------------------------------------
-     28. DISPATCH TABLE
+     30. DISPATCH TABLE
      ------------------------------------------------------------ */
   const BUILTIN_COMMANDS = {
     help:1, about:1, banner:1, clear:1, cls:1, echo:1, date:1, time:1,
@@ -3334,7 +4207,7 @@
     xdg_open:1, proxy:1, matrix:1, pkg:1, apt:1, apt_get:1,
     reboot:1, restart:1, reset:1, exit:1, logout:1, sudo:1, '?':1,
     theme:1, scheme:1,
-    'termux-style':1, tstyle:1,
+    'termux-style':1, tstyle:1, 'install':1, 'uninstall':1,
     'termux-api':1,
     'termux-boot':1, 'termux-float':1, 'termux-tasker':1, 'termux-widget':1,
     'termux-battery-status':1, 'termux-vibrate':1,
@@ -3390,14 +4263,10 @@
         println(C.red + 'hexai is not in the sudoers file. This incident has been reported. 😄' + C.r);
         return;
       case 'theme': case 'scheme':   return cmdTheme(args);
+      case 'install':                return cmdStyleInstall();
+      case 'uninstall':              return cmdStyleUninstall();
       case 'termux-style': case 'tstyle':
-        if (!state.installed['termux-styling']) {
-          println('');
-          println(C.red + 'termux-style: command not found' + C.r);
-          println(C.gry + 'hint: run ' + C.grn + '"pkg install termux-styling"' + C.gry + ' first.' + C.r);
-          println('');
-          return;
-        }
+        /* Delegate to cmdTermuxStyle which checks installation */
         return cmdTermuxStyle(args);
       case 'termux-api':   return cmdTermuxApi(args);
       case 'termux-boot':  return cmdAddonBoot();
@@ -3451,7 +4320,7 @@
   }
 
   /* ------------------------------------------------------------
-     29. BOOT SEQUENCE
+     31. BOOT SEQUENCE
      ------------------------------------------------------------ */
   async function bootSequence(isReboot) {
     state.closed = false;
@@ -3461,19 +4330,20 @@
           'Flushing virtual filesystem',
           'Restarting xterm.js renderer',
           'Re-arming free proxy pool',
-          'Re-linking Pollinations LLM',
-          'Re-detecting device theme',
+          'Re-linking gen.pollinations.ai',
+          'Re-loading termux-style library',
           'Reloading HEX AI neural core',
           'All systems nominal'
         ]
       : [
-          'Initialising HEX kernel v3.4',
+          'Initialising HEX kernel v3.6',
           'Mounting virtual filesystem /hexai',
           'Detecting device theme preference',
           'Starting xterm.js renderer',
           'Loading network stack (free proxy pool)',
-          'Connecting to text.pollinations.ai (no API key)',
-          'Fetching HEX AI neural core',
+          'Connecting to gen.pollinations.ai',
+          'Loading Pollinations model catalog',
+          'Installing termux-style library (89 colors · 20 fonts)',
           'Attaching Termux input bridge',
           'Probing termux-api capabilities',
           'All systems nominal'
@@ -3491,20 +4361,31 @@
     println(C.gry + '  ┌─ SYSTEM ─────────────────────────────────┐' + C.r);
     println(C.gry + '  │ ' + C.grn + 'engine  ' + C.r + C.wht + 'xterm.js 5.5.0' + C.r);
     println(C.gry + '  │ ' + C.grn + 'theme   ' + C.r + C.wht + ThemeEngine.get() + ' (' + ThemeEngine.effective() + ')' + C.r);
-    println(C.gry + '  │ ' + C.grn + 'AI      ' + C.r + C.wht + 'text.pollinations.ai (live)' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'AI      ' + C.r + C.wht +
+            (state.apiKey ? 'gen.pollinations.ai (key set)' : 'gen.pollinations.ai (no key yet)') + C.r);
+    println(C.gry + '  │ ' + C.grn + 'model   ' + C.r + C.wht + state.model + C.r);
+    println(C.gry + '  │ ' + C.grn + 'style   ' + C.r + C.wht + SCHEME_NAMES.length + ' color-schemes · ' + FONTS.length + ' fonts' + C.r);
     println(C.gry + '  │ ' + C.grn + 'proxy   ' + C.r + C.wht + (PROXIES_POST.length + PROXIES_GET.length) + ' free nodes' + C.r);
     println(C.gry + '  │ ' + C.grn + 'addons  ' + C.r + C.wht + '6 termux addons available' + C.r);
-    println(C.gry + '  │ ' + C.grn + 'styles  ' + C.r + C.wht + SCHEME_NAMES.length + ' schemes · ' + FONTS.length + ' fonts' + C.r);
+    println(C.gry + '  │ ' + C.grn + 'tstyle  ' + C.r +
+            (state.tstyleInstalled ? C.grn + 'installed' + C.r : C.yel + 'run ./install' + C.r));
     println(C.gry + '  └──────────────────────────────────────────┘' + C.r);
     println('');
+    if (!state.apiKey) {
+      println(C.yel + '  ⚠ Tip: set a free API key for the upgraded AI experience' + C.r);
+      println(C.gry + '    1. visit ' + C.cyn + 'https://enter.pollinations.ai' + C.r);
+      println(C.gry + '    2. run  ' + C.grn + 'ai --key <your_key>' + C.r);
+      println('');
+    }
     println(C.wht + '  Type ' + C.grn + C.b + 'help' + C.r + C.wht + ' · ' +
-            C.grn + C.b + 'ai <question>' + C.r + C.wht + ' · ' +
-            C.grn + C.b + 'theme auto|dark|light' + C.r + '.' + C.r);
+            C.grn + C.b + './install' + C.r + C.wht + ' · ' +
+            C.grn + C.b + 'termux-style' + C.r + C.wht + ' · ' +
+            C.grn + C.b + 'ai <question>' + C.r + C.wht + '.' + C.r);
     println('');
   }
 
   /* ------------------------------------------------------------
-     30. EXTRA-KEYS ROW
+     32. EXTRA-KEYS ROW
      ------------------------------------------------------------ */
   const KEYS = [
     { label:'ESC',  seq:'\x1b' },
@@ -3564,7 +4445,7 @@
   buildKeyRow();
 
   /* ------------------------------------------------------------
-     31. TERMINAL FOCUS + LONG-PRESS CONTEXT MENU
+     33. TERMINAL FOCUS + LONG-PRESS CONTEXT MENU
      ------------------------------------------------------------ */
   termEl.addEventListener('touchstart', () => { term.focus(); }, { passive: true });
   termEl.addEventListener('click', () => { term.focus(); });
@@ -3599,7 +4480,7 @@
   });
 
   /* ------------------------------------------------------------
-     32. UI MENU / DRAWER ACTIONS
+     34. UI MENU / DRAWER ACTIONS
      ------------------------------------------------------------ */
   function openMenu() {
     ROOT.classList.add('menu-open');
@@ -3672,6 +4553,15 @@
       case 'theme-light':
         ThemeEngine.set('light');
         showToast('🎨 Theme: light', 'ok'); break;
+      case 'ai-setkey':
+        cmdAI(['--key']); break;
+      case 'ai-models':
+        cmdAI(['--models']); break;
+      case 'ai-status':
+        cmdAI(['--status']); break;
+      case 'ai-clear':
+        resetConversation();
+        showToast('AI memory cleared', 'ok'); break;
       case 'pkg-api':
         cmdPkg(['install','termux-api']); break;
       case 'pkg-styling':
@@ -3681,18 +4571,13 @@
         else cmdPkg(['install','termux-float']);
         break;
       case 'style-menu':
-        if (state.installed['termux-styling']) cmdTermuxStyle([]);
-        else { showToast('Install termux-styling first', 'warn'); cmdPkg(['install','termux-styling']); }
+        if (state.tstyleInstalled) cmdTermuxStyle([]);
+        else { showToast('Install termux-style first (./install)', 'warn'); cmdStyleInstall(); }
         break;
       case 'help':
         term.clear(); cmdHelp().then(printPrompt); break;
       case 'about':
         term.clear(); cmdAbout().then(printPrompt); break;
-      case 'ai-status':
-        cmdAI(['--status']); break;
-      case 'ai-clear':
-        resetConversation();
-        showToast('AI memory cleared', 'ok'); break;
     }
   }
 
@@ -3710,7 +4595,7 @@
   });
 
   /* ------------------------------------------------------------
-     33. RESPONSIVE FIT
+     35. RESPONSIVE FIT
      ------------------------------------------------------------ */
   function responsiveFont() {
     const w = termEl.clientWidth || ROOT.clientWidth;
@@ -3739,7 +4624,7 @@
   }
 
   /* ------------------------------------------------------------
-     34. TERMINAL PALETTE HINTS FOR AUTO THEME
+     36. THEME COLOR META
      ------------------------------------------------------------ */
   function updateTerminalPaletteHints(eff) {
     try {
@@ -3751,12 +4636,13 @@
   }
 
   /* ------------------------------------------------------------
-     35. BOOT / START
+     37. BOOT / START
      ------------------------------------------------------------ */
   (async function start() {
     ThemeEngine.init();
     updateTerminalPaletteHints(ThemeEngine.effective());
 
+    /* Restore persisted prefs */
     try {
       const s = localStorage.getItem('hexai.scheme');
       if (s && SCHEMES[s]) {
@@ -3770,6 +4656,15 @@
         state.font = f;
         term.options.fontFamily = FONTS.find((x) => x.id === f).css + ', monospace';
       }
+      const k = loadApiKey();
+      if (k) state.apiKey = k;
+      const m = loadModel();
+      state.model = m || HEX_AI_DEFAULT_MODEL;
+
+      /* termux-style state */
+      state.currentColor = loadCurrentColor();
+      state.currentFont  = loadCurrentFont();
+      state.tstyleInstalled = !!localStorage.getItem('hexai.tstyle_installed');
     } catch (e) {}
 
     await sleep(80); fitNow();
@@ -3785,29 +4680,19 @@
     printPrompt();
     term.focus();
 
-    /* --- Silent AI endpoint probe (uses GET, CORS-friendly) --- */
+    /* Silent probe of the AI endpoints */
     setTimeout(async () => {
       try {
-        const probeUrl = HEX_AI_GET_BASE + encodeURIComponent('ping') + '?model=' + encodeURIComponent(HEX_AI_MODEL);
         const ctrl = new AbortController();
         const to = setTimeout(() => ctrl.abort(), 6000);
-        const r = await fetch(probeUrl, { signal: ctrl.signal });
+        const r = await fetch(HEX_AI_MODELS_URL, { signal: ctrl.signal });
         clearTimeout(to);
-        if (!r.ok) {
-          /* try via proxy */
-          const viaProxy = PROXIES_GET[0].url(probeUrl);
-          const r2 = await fetch(viaProxy);
-          if (!r2.ok) state.aiLive = false;
-        }
+        if (!r.ok) throw new Error('models ' + r.status);
       } catch (e) {
-        /* If direct fails, try through the first GET proxy */
         try {
-          const probeUrl = HEX_AI_GET_BASE + encodeURIComponent('ping') + '?model=' + encodeURIComponent(HEX_AI_MODEL);
-          const r = await fetch(PROXIES_GET[0].url(probeUrl));
-          if (!r.ok) state.aiLive = false;
-        } catch (e2) {
-          state.aiLive = false;
-        }
+          const r2 = await fetch(PROXIES_GET[0].url(HEX_AI_MODELS_URL));
+          if (!r2.ok) state.aiLive = false;
+        } catch (e2) {}
       }
     }, 1200);
 
@@ -3816,9 +4701,27 @@
     });
 
     setTimeout(() => {
-      showToast('💡 Long-press for Termux menu', 'ok');
+      if (!state.apiKey) {
+        showToast('🔑 Set an AI key: ai --key', 'warn');
+      } else if (!state.tstyleInstalled) {
+        showToast('🎨 Run ./install for termux-style', 'ok');
+      } else {
+        showToast('💡 Long-press for Termux menu', 'ok');
+      }
     }, 900);
   })();
+
+  /* Persist tstyle_installed flag */
+  const _origInstall = cmdStyleInstall;
+  cmdStyleInstall = async function() {
+    await _origInstall.call(this);
+    try { localStorage.setItem('hexai.tstyle_installed', '1'); } catch (e) {}
+  };
+  const _origUninstall = cmdStyleUninstall;
+  cmdStyleUninstall = async function() {
+    await _origUninstall.call(this);
+    try { localStorage.removeItem('hexai.tstyle_installed'); } catch (e) {}
+  };
 
 })();
 </script>
