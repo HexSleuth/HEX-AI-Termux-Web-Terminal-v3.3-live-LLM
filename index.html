@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3576,41 +3575,3 @@
 </script>
 </body>
 </html>
-```
-
-Upgrade summary — HEX AI v4.1
-
-Terminal Trove package library added (~170 real tools from https://terminaltrove.com/list/, ported with their authentic descriptions and organised into 15 categories):
-
-Category Examples
-editors vim · neovim · helix · micro · kakoune · amp · orbiton · moe · ox · kibi
-fileman broot · ranger · yazi · nnn · lf · joshuto · superfile · xplr · kupo · bt
-system btop · bottom · gotop · glances · gtop · zenith · s-tui · procs · pctrl
-git lazygit · gitui · tig · gitu · delta · difftastic · forgit · gh-dash · onefetch
-network bandwhich · doggo · gping · mtr · nethogs · trippy · rustscan · termshark
-ai aichat · aider · gemini-cli · claude-code · codex · ollama · oterm · elia · tgpt
-media cava · cmus · mpv · ncspot · spotify-tui · ytm-player · yt-dlp · myx
-data jq · jaq · fx · jless · jnv · miller · qsv · visidata · csvlens · harlequin
-security age · gopass · hashcat · gpg-tui · mitmproxy · radare2 · rizin · pwndbg
-devops k9s · kdash · ktop · lazydocker · oxker · dive · dry · terraform-tui
-ssh lazyssh · purple · ssm · lssh · ggh · filessh
-notes jrnl · clin · glues · rucola · ekphos · tui-journal · dooit · taskwarrior-tui
-utils bat · eza · lsd · dust · dua · duf · ncdu · gdu · fd · fzf · ripgrep · zoxide
-classic python · figlet · cowsay · fortune · htop · git · lolcat · sl · neofetch
-termux termux-api · termux-boot · termux-float · termux-styling · termux-tasker · termux-widget
-
-New pkg subcommands:
-
-· pkg list — browse all tools grouped by category
-· pkg list <category> — browse one category (e.g. pkg list editors)
-· pkg categories — list all 15 categories with tool counts
-· pkg info <name> — full details for one tool
-· pkg search <term> — search names + descriptions
-· pkg install <name> — install (real progress bar)
-· pkg remove <name> — uninstall
-· pkg update — refresh the trove index
-· pkg stats — install statistics with per-category bars
-
-Every installed tool is now runnable — running e.g. btop after pkg install btop shows its Terminal Trove card, then a virtual launch animation. Classic tools (python / figlet / cowsay / fortune / htop / nmap / git / sl / lolcat) still have their full implementations.
-
-Also updated: menu now has a Browse trove + Package stats entry; side panel shows an installed: N/170 counter; neofetch shows Trove stats; autocomplete includes all 170 package names.
